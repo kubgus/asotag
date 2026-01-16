@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"math/rand/v2"
+	"math"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func (c *Context) ExecuteRound() {
 		if entity.GetHealth() > 0 {
 			entity.Reset(c)
 
-			time.Sleep(time.Duration(1000 + rand.IntN(700)) * time.Millisecond)
+			time.Sleep(time.Duration((math.Round(6000 / float64(len(c.World.MoveOrder))))) * time.Millisecond)
 
 			fmt.Printf("%v %v's turn %v\n\n",
 				FmtTooltip("======>"),

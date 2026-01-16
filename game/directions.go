@@ -38,5 +38,5 @@ func DeltaToDir(dx, dy int) (string, bool) {
 		}
 	}
 
-	return "unknown direction", false
+	return "in an unknown direction", false
 }

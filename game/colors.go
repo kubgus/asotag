@@ -10,4 +10,6 @@ var (
 	FmtTooltip = utils.NewColor(utils.ColorFgDim, utils.ColorFgWhite)
 	FmtHero = utils.NewColor(utils.ColorFgBold, utils.ColorFgCyan)
 	FmtAction = utils.NewColor(utils.ColorFgBold, utils.ColorFgYellow)
+	FmtSystem = utils.NewColor(utils.ColorFgBold, utils.ColorFgPurple)
+	FmtLocation = utils.NewColor(utils.ColorFgBold, utils.ColorFgItalic, utils.ColorFgWhite)
 )

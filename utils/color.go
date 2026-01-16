@@ -31,7 +31,6 @@ const (
 	ColorFgCyan   = "\033[36m"
 	ColorFgWhite  = "\033[37m"
 
-	ColorBgReset  = "\033[0m"
 	ColorBgRed    = "\033[41m"
 	ColorBgGreen  = "\033[42m"
 	ColorBgYellow = "\033[43m"
@@ -39,6 +38,24 @@ const (
 	ColorBgPurple = "\033[45m"
 	ColorBgCyan   = "\033[46m"
 	ColorBgWhite  = "\033[47m"
+
+	ColorFgBrightBlack  = "\033[90m"
+	ColorFgBrightRed    = "\033[91m"
+	ColorFgBrightGreen  = "\033[92m"
+	ColorFgBrightYellow = "\033[93m"
+	ColorFgBrightBlue   = "\033[94m"
+	ColorFgBrightPurple = "\033[95m"
+	ColorFgBrightCyan   = "\033[96m"
+	ColorFgBrightWhite  = "\033[97m"
+
+	ColorBgBrightBlack  = "\033[100m"
+	ColorBgBrightRed    = "\033[101m"
+	ColorBgBrightGreen  = "\033[102m"
+	ColorBgBrightYellow = "\033[103m"
+	ColorBgBrightBlue   = "\033[104m"
+	ColorBgBrightPurple = "\033[105m"
+	ColorBgBrightCyan   = "\033[106m"
+	ColorBgBrightWhite  = "\033[107m"
 )
 
 var GlobalStyleStack = &styleStack{}

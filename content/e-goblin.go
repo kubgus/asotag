@@ -1,4 +1,4 @@
-package entities
+package content
 
 import (
 	"fmt"
@@ -13,11 +13,20 @@ const (
 	defaultGoblinHealth = 30
 	defaultGoblinDamage = 5
 
-	surnameChanceGoblin = 0.01
+	surnameChanceGoblin = 1
+
+	dropChanceGoblin = 0.25
 
 	moveChanceGoblinChase = 0.6
 	moveChanceGoblinRandom = 0.2
 	moveChanceGoblinIdle = 0.2
+)
+
+var (
+	dropItemsGoblin = []game.Item{
+		NewKey(),
+		NewHealingPotion("Suspicious", 15),
+	}
 )
 
 var (
@@ -27,6 +36,36 @@ var (
 		"Zig",
 		"Steve",
 		"Juliette",
+		"Gnasher",
+		"Skritch",
+		"Zog",
+		"Bilge",
+		"Rattle",
+		"Snaggle",
+		"Kroak",
+		"Fizzle",
+		"Blight",
+		"Gribbit",
+		"Muck",
+		"Scab",
+		"Thistle",
+		"Grime",
+		"Pox",
+		"Jinx",
+		"Skitter",
+		"Grub",
+		"Vex",
+		"Wrench",
+		"Spite",
+		"Krag",
+		"Nibble",
+		"Sludge",
+		"Twitch",
+		"Guzzle",
+		"Blot",
+		"Shank",
+		"Murk",
+		"Zap",
 	}
 )
 
@@ -69,25 +108,49 @@ func (g *Goblin) GetHealthString(includeWordHealth bool) string {
 	return game.FmtHealth(result)
 }
 
-func (g *Goblin) AddHealth(amount int) string {
+func (g *Goblin) AddHealth(amount int) (string, bool) {
 	g.Health += amount
 	if g.Health <= 0 {
-		return fmt.Sprintf("%v has perished.", g.GetName())
+		return fmt.Sprintf(
+			"%v has perished.",
+			g.GetName(),
+			), false
 	}
-	return fmt.Sprintf("%v is now at %v.", g.GetName(), g.GetHealthString(true))
+	return fmt.Sprintf(
+		"%v is now at %v.",
+		g.GetName(),
+		g.GetHealthString(true),
+		), true
 }
 
-func (g *Goblin) Reset(context *game.Context) {
-	// Goblins have no per-turn state to reset
+func (g *Goblin) Examine(user game.Entity) string {
+	return fmt.Sprintf(
+		"%v tries to strike up a conversation with %v, but it seems uninterested in talking.\n",
+		user.GetName(),
+		g.GetName(),
+		)
 }
+
+func (g *Goblin) Loot(user game.Entity) []game.Item {
+	rgn := rand.Float32()
+	switch {
+	case rgn < dropChanceGoblin:
+		item := dropItemsGoblin[rand.IntN(len(dropItemsGoblin))]
+		return []game.Item{item}
+	default:
+		return []game.Item{}
+	}
+}
+
+func (g *Goblin) Reset(context *game.Context) { }
 
 func (g *Goblin) Move(context *game.Context) (string, bool) {
 	occupants := context.World.GetOccupantsSameTile(g)
 	for _, entity := range occupants {
 		if _, isGoblin := entity.(*Goblin); !isGoblin && entity.GetHealth() > 0 {
-			targetStatus := entity.AddHealth(-g.Damage)
+			response, _ := entity.AddHealth(-g.Damage)
 			return fmt.Sprintf("%v attacks %v for %d damage! %v\n",
-				g.GetName(), entity.GetName(), g.Damage, targetStatus), true
+				g.GetName(), entity.GetName(), g.Damage, response), true
 		}
 	}
 
