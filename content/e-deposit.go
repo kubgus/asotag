@@ -23,16 +23,15 @@ func (d *Deposit) GetName() string {
 	return game.FmtLocation(d.Name)
 }
 
-func (d *Deposit) GetDesc() string {
-	return "A natural deposit of " + game.FmtItem(d.Type.String()) + "."
-}
-
 func (d *Deposit) GetHealth() int {
 	return 0
 }
 
 func (d *Deposit) GetHealthString(includeWordHealth bool) string {
-	return game.FmtHealth("Fixed")
+	if d.Amount > 0 {
+		return game.FmtHealth("Full")
+	}
+	return game.FmtHealth("Empty")
 }
 
 func (d *Deposit) AddHealth(amount int) (string, bool) {
@@ -44,7 +43,7 @@ func (d *Deposit) AddHealth(amount int) (string, bool) {
 
 func (d *Deposit) Examine(user game.Entity) string {
 	return fmt.Sprintf(
-		"%v contains a deposit of %d units of %v.",
+		"%v contains a deposit of %d units of %v.\n",
 		d.GetName(),
 		d.Amount,
 		game.FmtItem(d.Type.String()),

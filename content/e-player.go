@@ -199,6 +199,12 @@ var actions = map[string]actionFunc{
 				for _, idx := range bundleIdxs {
 					items = append(items, player.Inventory[idx])
 				}
+				// Sort bundleIdxs in descending order
+				// to safely remove items from inventory
+				// without affecting the indexes of yet-to-be-removed items
+				sort.Slice(bundleIdxs, func(i, j int) bool {
+					return bundleIdxs[i] > bundleIdxs[j]
+				})
 				// Remove bundled items from inventory
 				// after collecting them to bundle
 				// to avoid index shifting issues

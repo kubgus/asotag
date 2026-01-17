@@ -82,7 +82,7 @@ func (w *Workbench) GetHealth() int {
 }
 
 func (w *Workbench) GetHealthString(includeWordHealth bool) string {
-	return game.FmtHealth("Fixed")
+	return game.FmtHealth("Solid")
 }
 
 func (w *Workbench) AddHealth(amount int) (string, bool) {
@@ -110,7 +110,7 @@ func (w *Workbench) Examine(user game.Entity) string {
 		"\n",
 		func(i int, item game.Item) string {
 			return fmt.Sprintf(
-				"%v: %v",
+				"%v <- %v",
 				item.GetName(),
 				game.ListItems(w.Recipes[item]),
 				)
@@ -118,8 +118,11 @@ func (w *Workbench) Examine(user game.Entity) string {
 		)
 
 	return fmt.Sprintf(
-		"%v can be used to craft the following items:\n%v",
-		w.GetName(),
+		"%v\n%v\n",
+		fmt.Sprintf(
+			game.FmtTooltip("%v can be used to craft the following items:"),
+			w.GetName(),
+		),
 		recipesList,
 	)
 }
