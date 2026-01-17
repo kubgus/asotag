@@ -13,39 +13,41 @@ type Context struct {
 }
 
 func (c *Context) ExecuteRound() {
-	for _, entity := range c.World.MoveOrder {
-		if entity.GetHealth() > 0 {
-			entity.Reset(c)
-
-			time.Sleep(time.Duration((math.Round(6000 / float64(len(c.World.MoveOrder))))) * time.Millisecond)
-
-			fmt.Printf("%v %v's turn %v\n\n",
-				FmtTooltip("======>"),
-				entity.GetName(),
-				FmtTooltip("<======"),
-				)
-		} else {
+	for _, entity := range c.World.EntityOrder {
+		if entityHealth, ok := entity.(EntityHealth); ok && entityHealth.GetHealth() <= 0 {
 			c.World.Remove(entity, true)
 			continue
 		}
 
-		for {
-			result, endTurn := entity.Move(c)
+		if entityActive, ok := entity.(EntityActive); ok {
+			entityActive.BeforeTurn(c)
 
-			fmt.Println(result)
+			time.Sleep(time.Duration((math.Round(6000 / float64(len(c.World.EntityOrder))))) * time.Millisecond)
 
-			if entity.GetHealth() <= 0 {
-				c.World.Remove(entity, true)
-				break
+			fmt.Printf("%v %v's turn %v\n\n",
+				ColTooltip("======>"),
+				entity.GetName(),
+				ColTooltip("<======"),
+				)
+
+			for {
+				response, endTurn := entityActive.OnTurn(c)
+
+				fmt.Println(response)
+
+				if entityHealth, ok := entity.(EntityHealth); ok && entityHealth.GetHealth() <= 0 {
+					c.World.Remove(entity, true)
+					break
+				}
+
+				if endTurn {
+					break
+				}
 			}
 
-			if endTurn {
-				break
+			if c.CheatRevealMap {
+				c.World.debugPrint(entity)
 			}
-		}
-
-		if c.CheatRevealMap {
-			c.World.debugPrint(entity)
 		}
 	}
 }

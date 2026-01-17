@@ -19,7 +19,7 @@ func ListDirections() string {
 		keys = append(keys, k)
 	}
 	return utils.JoinAdvanced(keys, ", ", " or ", func(_ int, direction string) string {
-		return FmtAction(direction)
+		return ColAction(direction)
 	})
 }
 

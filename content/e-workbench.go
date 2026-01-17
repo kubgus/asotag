@@ -70,39 +70,17 @@ func NewWorkbench() *Workbench {
 }
 
 func (w *Workbench) GetName() string {
-	return game.FmtLocation("Workbench")
+	return game.ColLocation("Workbench")
 }
 
-func (w *Workbench) GetDesc() string {
-	return "A sturdy workbench used for crafting items."
+func (w *Workbench) GetStatus() string {
+	return game.ColHealth("Solid")
 }
 
-func (w *Workbench) GetHealth() int {
-	return 0
-}
-
-func (w *Workbench) GetHealthString(includeWordHealth bool) string {
-	return game.FmtHealth("Solid")
-}
-
-func (w *Workbench) AddHealth(amount int) (string, bool) {
-	return fmt.Sprintf(
-		"%v seems completely unaffected.",
-		w.GetName(),
-	), true
-}
-
-func (w *Workbench) Examine(user game.Entity) string {
+func (w *Workbench) GetDesc(user game.Entity) string {
 	craftableItems := make([]game.Item, 0, len(w.Recipes))
 	for item := range w.Recipes {
 		craftableItems = append(craftableItems, item)
-	}
-
-	if len(craftableItems) == 0 {
-		return fmt.Sprintf(
-			"%v has no available recipes at the moment.",
-			w.GetName(),
-		)
 	}
 
 	recipesList := utils.JoinWithMapFunc(
@@ -120,24 +98,11 @@ func (w *Workbench) Examine(user game.Entity) string {
 	return fmt.Sprintf(
 		"%v\n%v\n",
 		fmt.Sprintf(
-			game.FmtTooltip("%v can be used to craft the following items:"),
+			game.ColTooltip("%v can be used to craft the following items:"),
 			w.GetName(),
 		),
 		recipesList,
 	)
-}
-
-func (w *Workbench) Loot(user game.Entity) []game.Item {
-	return []game.Item{}
-}
-
-func (w *Workbench) Reset(context *game.Context) { }
-
-func (w *Workbench) Move(context *game.Context) (string, bool) {
-	return fmt.Sprintf(
-		"%v remains firmly in place.",
-		w.GetName(),
-	), true
 }
 
 func (w *Workbench) Craft(user game.Entity, items []game.Item) game.Item {

@@ -13,7 +13,7 @@ type world struct {
 	Positions map[Entity]Point
 	Occupants map[Point][]Entity
 
-	MoveOrder []Entity
+	EntityOrder []Entity
 
 	Size      int
 }
@@ -22,25 +22,31 @@ func NewWorld(size int) *world {
 	return &world{
 		Positions: make(map[Entity]Point),
 		Occupants: make(map[Point][]Entity),
-		MoveOrder: make([]Entity, 0),
+		EntityOrder: make([]Entity, 0),
 		Size:      size,
 	}
 }
 
-func (w *world) Add(entity Entity, x, y int, addToMoveOrder bool) {
+func (w *world) Add(entity Entity, x, y int, addToOrder bool) bool {
+	if x < 0 || x >= w.Size || y < 0 || y >= w.Size {
+		return false
+	}
+
 	p := Point{x, y}
 	w.Positions[entity] = p
 	w.Occupants[p] = append(w.Occupants[p], entity)
 
-	if addToMoveOrder {
-		w.MoveOrder = append(w.MoveOrder, entity)
+	if addToOrder {
+		w.EntityOrder = append(w.EntityOrder, entity)
 	}
+
+	return true
 }
 
-func (w *world) Remove(entity Entity, removeFromMoveOrder bool) {
+func (w *world) Remove(entity Entity, removeFromOrder bool) bool {
 	pos, ok := w.Positions[entity]
 	if !ok {
-		return
+		return false
 	}
 
 	tileEntities := w.Occupants[pos]
@@ -58,14 +64,16 @@ func (w *world) Remove(entity Entity, removeFromMoveOrder bool) {
 
 	delete(w.Positions, entity)
 
-	if removeFromMoveOrder {
-		for i, e := range w.MoveOrder {
+	if removeFromOrder {
+		for i, e := range w.EntityOrder {
 			if e == entity {
-				w.MoveOrder = append(w.MoveOrder[:i], w.MoveOrder[i+1:]...)
+				w.EntityOrder = append(w.EntityOrder[:i], w.EntityOrder[i+1:]...)
 				break
 			}
 		}
 	}
+
+	return true
 }
 
 func (w *world) Move(entity Entity, x, y int) {
@@ -90,7 +98,7 @@ func (w *world) MoveInDirection(entity Entity, dx, dy int) (string, bool) {
 	w.Add(entity, newPos.X, newPos.Y, false)
 
 	direction, _ := DeltaToDir(dx, dy)
-	return fmt.Sprintf("%v moves %v.\n", entity.GetName(), FmtAction(direction)), true
+	return fmt.Sprintf("%v moves %v.\n", entity.GetName(), ColAction(direction)), true
 }
 
 func (w *world) GetEntityPos(entity Entity) (int, int, bool) {
@@ -120,15 +128,15 @@ func (w *world) debugPrint(highlightEntity Entity) {
 	fmt.Println()
 
 	// Top Border
-	fmt.Print("  " + FmtTooltip("┌"))
+	fmt.Print("  " + ColTooltip("┌"))
 	for x := 0; x < w.Size; x++ {
-		fmt.Print(FmtTooltip("───"))
+		fmt.Print(ColTooltip("───"))
 	}
-	fmt.Println(FmtTooltip("┐"))
+	fmt.Println(ColTooltip("┐"))
 
 	for y := 0; y < w.Size; y++ {
 		// Y-axis coordinate
-		fmt.Printf("%d " + FmtTooltip("│"), y%10)
+		fmt.Printf("%d " + ColTooltip("│"), y%10)
 
 		for x := 0; x < w.Size; x++ {
 			occupants := w.Occupants[Point{x, y}]
@@ -169,13 +177,13 @@ func (w *world) debugPrint(highlightEntity Entity) {
 				}
 			}
 		}
-		fmt.Println(FmtTooltip("│"))
+		fmt.Println(ColTooltip("│"))
 	}
 
 	// Bottom Border
-	fmt.Print("  " + FmtTooltip("└"))
+	fmt.Print("  " + ColTooltip("└"))
 	for x := 0; x < w.Size; x++ {
-		fmt.Print(FmtTooltip("───"))
+		fmt.Print(ColTooltip("───"))
 	}
-	fmt.Println(FmtTooltip("┘"))
+	fmt.Println(ColTooltip("┘"))
 }

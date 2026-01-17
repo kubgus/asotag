@@ -20,18 +20,18 @@ func NewDeposit(name string, depositType Material, amount int) *Deposit {
 }
 
 func (d *Deposit) GetName() string {
-	return game.FmtLocation(d.Name)
+	return game.ColLocation(d.Name)
 }
 
 func (d *Deposit) GetHealth() int {
 	return 0
 }
 
-func (d *Deposit) GetHealthString(includeWordHealth bool) string {
+func (d *Deposit) GetStatus() string {
 	if d.Amount > 0 {
-		return game.FmtHealth("Full")
+		return game.ColHealth("Full")
 	}
-	return game.FmtHealth("Empty")
+	return game.ColHealth("Empty")
 }
 
 func (d *Deposit) AddHealth(amount int) (string, bool) {
@@ -41,16 +41,16 @@ func (d *Deposit) AddHealth(amount int) (string, bool) {
 	), true
 }
 
-func (d *Deposit) Examine(user game.Entity) string {
+func (d *Deposit) GetDesc(user game.Entity) string {
 	return fmt.Sprintf(
 		"%v contains a deposit of %d units of %v.\n",
 		d.GetName(),
 		d.Amount,
-		game.FmtItem(d.Type.String()),
+		game.ColItem(d.Type.String()),
 	)
 }
 
-func (d *Deposit) Loot(user game.Entity) []game.Item {
+func (d *Deposit) GetLoot(user game.Entity) []game.Item {
 	result := make([]game.Item, 0, d.Amount)
 	for i := 0; i < d.Amount; i++ {
 		result = append(result, NewResource(d.Type))
@@ -59,9 +59,9 @@ func (d *Deposit) Loot(user game.Entity) []game.Item {
 	return result
 }
 
-func (d *Deposit) Reset(context *game.Context) { }
+func (d *Deposit) BeforeTurn(context *game.Context) { }
 
-func (d *Deposit) Move(context *game.Context) (string, bool) {
+func (d *Deposit) OnTurn(context *game.Context) (string, bool) {
 	return fmt.Sprintf(
 		"%v can't be bothered.",
 		d.GetName(),

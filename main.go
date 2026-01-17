@@ -27,7 +27,7 @@ const (
 )
 
 func main() {
-	fmt.Print(game.FmtSystem(
+	fmt.Print(game.ColSystem(
 		"Welcome to the Text Adventure Game!\n" +
 		"Defeat all enemies to win, but beware of your health!\n\n\n",
 		))
@@ -53,9 +53,11 @@ func main() {
 		// Win by all enemies defeated
 		allEnemiesDefeated := true
 		for _, enemy := range enemies {
-			if enemy.GetHealth() > 0 {
-				allEnemiesDefeated = false
-				break
+			if enemyHealth, ok := enemy.(game.EntityHealth); ok {
+				if enemyHealth.GetHealth() > 0 {
+					allEnemiesDefeated = false
+					break
+				}
 			}
 		}
 		if allEnemiesDefeated {
@@ -69,17 +71,18 @@ func main() {
 
 	time.Sleep(2 * time.Second)
 	if win {
-		fmt.Print(game.FmtSystem(
+		fmt.Print(game.ColSystem(
 			"\nWith the last enemy defeated, you stand victorious!\n",
 			))
 	} else if lose {
-		fmt.Print(game.FmtSystem(
+		fmt.Print(game.ColSystem(
 			"\nYou have fallen in battle. Your adventure ends here.\n",
 			))
 	}
 	time.Sleep(3 * time.Second)
-	fmt.Print(game.FmtSystem("Thank you for playing! Feel free to try again.\n"))
+	fmt.Print(game.ColSystem("Thank you for playing! Feel free to try again.\n"))
 	time.Sleep(2 * time.Second)
+	fmt.Scanln()
 }
 
 func addPlayer(context *game.Context) *content.Player {

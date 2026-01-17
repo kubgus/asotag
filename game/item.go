@@ -10,12 +10,12 @@ type Item interface {
 	GetName() string
 	GetDesc() string
 
-	Use(user, target Entity) (response string, ok bool, consume bool)
+	Use(user, target Entity) (response string, ok, consume bool)
 }
 
 func ListItems(items []Item) string {
 	if len(items) == 0 {
-		return FmtTooltip("None")
+		return ColTooltip("None")
 	}
 
 	var keys []string
@@ -27,15 +27,15 @@ func ListItems(items []Item) string {
 
 func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string) string {
 	if len(items) == 0 {
-		return FmtTooltip("None")
+		return ColTooltip("None")
 	}
 
 	return utils.JoinWithMapFunc(items, "\n", func(i int, item Item) string {
 		return fmt.Sprintf(
 			"%v: %v %v %v",
-			FmtAction(strconv.Itoa(i)),
+			ColAction(strconv.Itoa(i)),
 			item.GetName(),
-			FmtTooltip("-"),
+			ColTooltip("-"),
 			f(i, item),
 			)
 	})

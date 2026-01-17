@@ -12,7 +12,7 @@ func NewKey() *Key {
 }
 
 func (k *Key) GetName() string {
-	return game.FmtItem("Key")
+	return game.ColItem("Key")
 }
 
 func (k *Key) GetDesc() string {
@@ -22,28 +22,18 @@ func (k *Key) GetDesc() string {
 func (k *Key) Use(user, target game.Entity) (string, bool, bool) {
 	chest, ok := target.(*Chest)
 	if !ok {
-		return fmt.Sprintf(
-			"%v pokes %v with %v. It's not very effective.\n",
-			user.GetName(),
-			target.GetName(),
-			k.GetName(),
-		), false, false
+		return game.SnipCannotUseItemOn(user, target, k), false, false
 	}
-
 	if chest.IsUnlocked {
-		return fmt.Sprintf(
-			"%v tries to use %v on %v, but it's already unlocked.\n",
-			user.GetName(),
-			k.GetName(),
-			target.GetName(),
-		), false, false
+		return game.SnipCannotUseItemOn(user, target, k), false, false
 	}
 
-	loot := target.Loot(user)
+	loot := chest.GetLoot(user)
 
-	player, ok := user.(*Player)
-	if ok {
-		player.Inventory = append(player.Inventory, loot...)
+	if player, ok := user.(*Player); ok {
+		player.CollectLoot(loot)
+	} else {
+		return game.SnipItemCannotBeUsedBy(user, k), false, false
 	}
 
 	return fmt.Sprintf(

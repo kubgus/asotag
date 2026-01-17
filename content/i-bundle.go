@@ -16,7 +16,7 @@ func NewBundle(items []game.Item) *Bundle {
 }
 
 func (b *Bundle) GetName() string {
-	return game.FmtItem("Bundle")
+	return game.ColItem("Bundle")
 }
 
 func (b *Bundle) GetDesc() string {
@@ -36,13 +36,14 @@ func (b *Bundle) Use(user, target game.Entity) (string, bool, bool) {
 	}
 
 	if craftedItem != nil {
-		player, ok := user.(*Player)
-		if ok {
-			player.Inventory = append(player.Inventory, craftedItem)
+		if player, ok := user.(*Player); ok {
+			player.CollectLoot([]game.Item{craftedItem})
+		} else {
+			return game.SnipItemCannotBeUsedBy(user, b), false, false
 		}
 
 		return fmt.Sprintf(
-			"%v uses %v to craft %v!\n",
+			"%v uses %v to craft %v.\n",
 			user.GetName(),
 			game.ListItems(b.Items),
 			craftedItem.GetName(),
@@ -51,16 +52,11 @@ func (b *Bundle) Use(user, target game.Entity) (string, bool, bool) {
 
 	if craftingAllowed {
 		return fmt.Sprintf(
-			"%v tries to craft something from %v, but cannot figure anything out.\n",
+			"%v tries to craft something out of %v, but cannot figure anything out.\n",
 			user.GetName(),
 			game.ListItems(b.Items),
 			), false, false
 	}
 
-	return fmt.Sprintf(
-		"%v does not accept the gift from %v.\nMaybe %v should use it for crafting instead.\n",
-		target.GetName(),
-		user.GetName(),
-		user.GetName(),
-		), false, false
+	return game.SnipCannotUseItemOn(user, target, b), false, false
 }

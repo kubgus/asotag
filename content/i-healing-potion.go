@@ -19,27 +19,32 @@ func NewHealingPotion(prefix string, healAmount int) *HealingPotion {
 }
 
 func (k *HealingPotion) GetName() string {
-	return game.FmtItem(k.Prefix + " Healing Potion")
+	return game.ColItem(k.Prefix + " Healing Potion")
 }
 
 func (k *HealingPotion) GetDesc() string {
 	return fmt.Sprintf(
 		"Restores %v when used.",
-		game.FmtHealth(strconv.Itoa(k.HealAmount) + " health"),
+		game.FormatHealth(k.HealAmount, true),
 	)
 }
 
 func (k *HealingPotion) Use(user, target game.Entity) (string, bool, bool) {
+	targetHealth, ok := target.(game.EntityHealth)
+	if !ok {
+		return game.SnipCannotUseItemOn(user, target, k), false, false
+	}
+
 	healAmount := k.HealAmount
 
-	response, alive := target.AddHealth(healAmount)
+	response, alive := targetHealth.AddHealth(healAmount)
 
 	return fmt.Sprintf(
 		"%v uses %v on %v, restoring %v! %v\n",
 		user.GetName(),
 		k.GetName(),
 		target.GetName(),
-		game.FmtHealth(strconv.Itoa(healAmount) + " health"),
+		game.ColHealth(strconv.Itoa(healAmount) + " health"),
 		response,
 	), alive, true
 }

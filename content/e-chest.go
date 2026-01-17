@@ -29,18 +29,18 @@ func NewChest() *Chest {
 }
 
 func (c *Chest) GetName() string {
-	return game.FmtLocation("Chest")
+	return game.ColLocation("Chest")
 }
 
 func (c *Chest) GetHealth() int {
 	return 0
 }
 
-func (c *Chest) GetHealthString(includeWordHealth bool) string {
+func (c *Chest) GetStatus() string {
 	if c.IsUnlocked {
-		return game.FmtHealth("Unlocked")
+		return game.ColHealth("Unlocked")
 	} else {
-		return game.FmtHealth("Locked")
+		return game.ColHealth("Locked")
 	}
 }
 
@@ -51,7 +51,7 @@ func (c *Chest) AddHealth(amount int) (string, bool) {
 	), true
 }
 
-func (c *Chest) Examine(user game.Entity) string {
+func (c *Chest) GetDesc(user game.Entity) string {
 	if c.IsUnlocked {
 		return fmt.Sprintf(
 			"%v is unlocked.",
@@ -65,7 +65,7 @@ func (c *Chest) Examine(user game.Entity) string {
 	}
 }
 
-func (c *Chest) Loot(user game.Entity) []game.Item {
+func (c *Chest) GetLoot(user game.Entity) []game.Item {
 	c.IsUnlocked = true
 
 	response := c.Contents
@@ -74,9 +74,9 @@ func (c *Chest) Loot(user game.Entity) []game.Item {
 	return response
 }
 
-func (c *Chest) Reset(context *game.Context) { }
+func (c *Chest) BeforeTurn(context *game.Context) { }
 
-func (c *Chest) Move(context *game.Context) (string, bool) {
+func (c *Chest) OnTurn(context *game.Context) (string, bool) {
 	return fmt.Sprintf(
 		"%v gains conciousness for a second.",
 		c.GetName(),

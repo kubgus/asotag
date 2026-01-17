@@ -22,34 +22,37 @@ func NewSword(name string, minDamage, maxDamage int) *Sword {
 }
 
 func (s *Sword) GetName() string {
-	return game.FmtItem(s.Name)
+	return game.ColItem(s.Name)
 }
 
 func (s *Sword) GetDesc() string {
 	return fmt.Sprintf(
 		"Deals %v to %v close-range damage.",
-		game.FmtDamage(strconv.Itoa(s.MinDamage)),
-		game.FmtDamage(strconv.Itoa(s.MaxDamage)),
+		game.ColDamage(strconv.Itoa(s.MinDamage)),
+		game.ColDamage(strconv.Itoa(s.MaxDamage)),
 		)
 }
 
 func (s *Sword) Use(user, target game.Entity) (string, bool, bool) {
+	targetHealth, ok := target.(game.EntityHealth)
+	if !ok {
+		return game.SnipCannotUseItemOn(user, target, s), false, false
+	}
+
 	damage := rand.IntN(s.MaxDamage - s.MinDamage + 1) + s.MinDamage
 
-	response, alive := target.AddHealth(-damage)
+	response, alive := targetHealth.AddHealth(-damage)
 
 	if !alive {
-		loot := target.Loot(user)
-		if len(loot) > 0 {
-			player, ok := user.(*Player)
-			if ok {
-				player.Inventory = append(player.Inventory, loot...)
+		if targetLoot, ok := target.(game.EntityLoot); ok {
+			loot := targetLoot.GetLoot(user)
+			if player, ok := user.(*Player); ok {
+				if responseLoot, ok := player.CollectLoot(loot); ok {
+					response += "\n" + responseLoot
+				}
+			} else {
+				return game.SnipItemCannotBeUsedBy(user, s), false, false
 			}
-
-			response += fmt.Sprintf(
-				"\nObtained items: %v",
-				game.ListItems(loot),
-				)
 		}
 	}
 
@@ -58,7 +61,7 @@ func (s *Sword) Use(user, target game.Entity) (string, bool, bool) {
 		user.GetName(),
 		target.GetName(),
 		s.GetName(),
-		game.FmtDamage(strconv.Itoa(damage)),
+		game.ColDamage(strconv.Itoa(damage)),
 		response,
 		), true, false
 }

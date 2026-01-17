@@ -23,13 +23,11 @@ const (
 )
 
 var (
-	dropItemsGoblin = []game.Item{
-		NewKey(),
-		NewHealingPotion("Suspicious", 15),
+	lootTableGoblin = map[game.Item]int{
+		NewKey(): 10,
+		NewHealingPotion("Suspicious", 15): 20,
 	}
-)
 
-var (
 	randomGoblinSurnames = []string{
 		"Archibald",
 		"Blot",
@@ -60,7 +58,7 @@ var (
 )
 
 var (
-	fmtGoblin = utils.NewColor(utils.ColorFgBold, utils.ColorFgGreen)
+	colGoblin = utils.NewColor(utils.ColorFgBold, utils.ColorFgGreen)
 )
 
 type Goblin struct {
@@ -85,35 +83,14 @@ func NewGoblin() *Goblin {
 }
 
 func (g *Goblin) GetName() string {
-	return fmtGoblin(g.Name)
+	return colGoblin(g.Name)
 }
 
-func (g *Goblin) GetHealth() int { return g.Health }
-
-func (g *Goblin) GetHealthString(includeWordHealth bool) string {
-	result := fmt.Sprintf("%d", g.GetHealth())
-	if includeWordHealth {
-		result += " health"
-	}
-	return game.FmtHealth(result)
+func (g *Goblin) GetStatus() string {
+	return game.FormatHealth(g.Health, false)
 }
 
-func (g *Goblin) AddHealth(amount int) (string, bool) {
-	g.Health += amount
-	if g.Health <= 0 {
-		return fmt.Sprintf(
-			"%v has perished.",
-			g.GetName(),
-			), false
-	}
-	return fmt.Sprintf(
-		"%v is now at %v.",
-		g.GetName(),
-		g.GetHealthString(true),
-		), true
-}
-
-func (g *Goblin) Examine(user game.Entity) string {
+func (g *Goblin) GetDesc(user game.Entity) string {
 	return fmt.Sprintf(
 		"%v tries to strike up a conversation with %v, but it seems uninterested in talking.\n",
 		user.GetName(),
@@ -121,26 +98,45 @@ func (g *Goblin) Examine(user game.Entity) string {
 		)
 }
 
-func (g *Goblin) Loot(user game.Entity) []game.Item {
-	rgn := rand.Float32()
-	switch {
-	case rgn < dropChanceGoblin:
-		item := dropItemsGoblin[rand.IntN(len(dropItemsGoblin))]
-		return []game.Item{item}
-	default:
-		return []game.Item{}
-	}
+func (g *Goblin) GetHealth() int {
+	return g.Health
 }
 
-func (g *Goblin) Reset(context *game.Context) { }
+func (g *Goblin) AddHealth(amount int) (string, bool) {
+	g.Health += amount
 
-func (g *Goblin) Move(context *game.Context) (string, bool) {
+	if g.Health <= 0 {
+		return fmt.Sprintf(
+			"%v has perished.",
+			g.GetName(),
+			), false
+	}
+
+	return game.GetHealthStatusResponse(g), true
+}
+
+func (g *Goblin) GetLoot(user game.Entity) []game.Item {
+	return game.GetRandomLoot(lootTableGoblin, 1)
+}
+
+func (g *Goblin) BeforeTurn(context *game.Context) { }
+
+func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 	occupants := context.World.GetOccupantsSameTile(g)
 	for _, entity := range occupants {
-		if _, isGoblin := entity.(*Goblin); !isGoblin && entity.GetHealth() > 0 {
-			response, _ := entity.AddHealth(-g.Damage)
-			return fmt.Sprintf("%v attacks %v for %d damage! %v\n",
-				g.GetName(), entity.GetName(), g.Damage, response), true
+		if _, isGoblin := entity.(*Goblin); isGoblin {
+			continue
+		}
+
+		if entityHealth, hasHealth := entity.(game.EntityHealth); hasHealth && entityHealth.GetHealth() > 0 {
+			response, _ := entityHealth.AddHealth(-g.Damage)
+			return fmt.Sprintf(
+				"%v attacks %v for %d damage! %v\n",
+				g.GetName(),
+				entity.GetName(),
+				g.Damage,
+				response,
+				), true
 		}
 	}
 
@@ -182,17 +178,19 @@ func (g *Goblin) getDirectionToClosestNonGoblin(context *game.Context) (int, int
 	minDistance := math.MaxFloat64
 
 	for entity, pos := range context.World.Positions {
-		if _, isGoblin := entity.(*Goblin); isGoblin || entity.GetHealth() <= 0 {
+		if _, isGoblin := entity.(*Goblin); isGoblin {
 			continue
 		}
+		if entityHealth, hasHealth := entity.(game.EntityHealth); hasHealth && entityHealth.GetHealth() > 0 {
+			// Calculate Euclidean distance
+			dist := math.Sqrt(math.Pow(float64(pos.X-currentPos.X), 2) + math.Pow(float64(pos.Y-currentPos.Y), 2))
 
-		// Calculate Euclidean distance
-		dist := math.Sqrt(math.Pow(float64(pos.X-currentPos.X), 2) + math.Pow(float64(pos.Y-currentPos.Y), 2))
-
-		if dist < minDistance {
-			minDistance = dist
-			target = entity
+			if dist < minDistance {
+				minDistance = dist
+				target = entity
+			}
 		}
+
 	}
 
 	if target == nil {

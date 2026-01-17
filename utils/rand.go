@@ -1,0 +1,22 @@
+package utils
+
+import "math/rand/v2"
+
+func RandIntInRange(minIncl, maxIncl int) int {
+	if minIncl >= maxIncl {
+		return minIncl
+	}
+	return rand.IntN(maxIncl-minIncl+1) + minIncl
+}
+
+func RandProbability(prob float64) bool {
+	return rand.Float64() < prob
+}
+
+func RandChoice[T any](choices []T) T {
+	if len(choices) == 0 {
+		var zero T
+		return zero
+	}
+	return choices[rand.IntN(len(choices))]
+}

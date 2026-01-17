@@ -2,7 +2,6 @@ package content
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"text-adventure-game/game"
 )
 
@@ -22,70 +21,31 @@ func NewPickaxe(material Material) *Pickaxe {
 }
 
 func (p *Pickaxe) GetName() string {
-	return game.FmtItem(p.Material.String() + " Pickaxe")
+	return game.ColItem(p.Material.String() + " Pickaxe")
 }
 
 func (p *Pickaxe) GetDesc() string {
 	return fmt.Sprintf(
-		"Can mine %v.",
-		game.FmtItem(p.MaxMineable().String()),
+		"Can mine %v and softer materials.",
+		game.ColItem(p.MaxMineable().String()),
 	)
 }
 
 func (p *Pickaxe) Use(user, target game.Entity) (string, bool, bool) {
 	deposit, ok := target.(*Deposit)
 	if !ok {
-		damage := rand.IntN(defaultPickaxeMaxDamage-defaultPickaxeMinDamage+1) + defaultPickaxeMinDamage
-
-		response, alive := target.AddHealth(-damage)
-
-		if !alive {
-			loot := target.Loot(user)
-			if len(loot) > 0 {
-				player, ok := user.(*Player)
-				if ok {
-					player.Inventory = append(player.Inventory, loot...)
-				}
-
-				response += fmt.Sprintf(
-					"\nObtained items: %v",
-					game.ListItems(loot),
-					)
-			}
-		}
-
-		return fmt.Sprintf(
-			"%v swings %v at %v and deals %d damage.\n",
-			user.GetName(),
-			p.GetName(),
-			target.GetName(),
-			damage,
-			), true, false
+		return game.SnipCannotUseItemOn(user, target, p), false, false
+	}
+	if deposit.Type > p.MaxMineable() || deposit.Amount == 0 {
+		return game.SnipCannotUseItemOn(user, target, p), false, false
 	}
 
-	if deposit.Type > p.MaxMineable() {
-		return fmt.Sprintf(
-			"%v tries to mine %v with %v, but it's too hard to break!\n",
-			user.GetName(),
-			deposit.GetName(),
-			p.GetName(),
-			), false, false
-	}
+	loot := deposit.GetLoot(user)
 
-	loot := deposit.Loot(user)
-
-	if len(loot) == 0 {
-		return fmt.Sprintf(
-			"%v tries to mine %v with %v, but there's nothing left to mine!\n",
-			user.GetName(),
-			deposit.GetName(),
-			p.GetName(),
-			), false, false
-	}
-
-	player, ok := user.(*Player)
-	if ok {
-		player.Inventory = append(player.Inventory, loot...)
+	if player, ok := user.(*Player); ok {
+		player.CollectLoot(loot)
+	} else {
+		return game.SnipItemCannotBeUsedBy(user, p), false, false
 	}
 
 	return fmt.Sprintf(
@@ -96,7 +56,6 @@ func (p *Pickaxe) Use(user, target game.Entity) (string, bool, bool) {
 		game.ListItems(loot),
 		), true, false
 }
-
 
 func (p *Pickaxe) MaxMineable() Material {
 	return p.Material + 1
