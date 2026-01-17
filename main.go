@@ -1,12 +1,12 @@
 package main
 
 import (
+	"asotag/content"
+	"asotag/game"
 	"fmt"
 	"math/rand/v2"
 	"os/user"
 	"strings"
-	"text-adventure-game/content"
-	"text-adventure-game/game"
 	"time"
 )
 
@@ -15,22 +15,20 @@ const (
 
 	enemyCountGoblin = 7
 
-	locationCountChest = 5
-	locationCountWorkbench = 2
-	locationCountDepositWood = 15
+	locationCountChest        = 5
+	locationCountWorkbench    = 2
+	locationCountDepositWood  = 15
 	locationCountDepositStone = 7
-	locationCountDepositIron = 5
-	locationCountDepositGold = 3
+	locationCountDepositIron  = 5
+	locationCountDepositGold  = 3
 
 	depositResCountMin = 3
 	depositResCountMax = 6
 )
 
 func main() {
-	fmt.Print(game.ColSystem(
-		"Welcome to the Text Adventure Game!\n" +
-		"Defeat all enemies to win, but beware of your health!\n\n\n",
-		))
+	fmt.Print(game.ColSystem("Welcome to ASOTAG!\n"))
+	fmt.Print(game.ColSystem("Defeat all enemies to win, but beware of your health!\n\n\n"))
 
 	context := game.Context{
 		World: *game.NewWorld(worldSize),
@@ -73,39 +71,41 @@ func main() {
 	if win {
 		fmt.Print(game.ColSystem(
 			"\nWith the last enemy defeated, you stand victorious!\n",
-			))
+		))
 	} else if lose {
 		fmt.Print(game.ColSystem(
 			"\nYou have fallen in battle. Your adventure ends here.\n",
-			))
+		))
 	}
 	time.Sleep(3 * time.Second)
 	fmt.Print(game.ColSystem("Thank you for playing! Feel free to try again.\n"))
 	time.Sleep(4 * time.Second)
+
+	fmt.Scan()
 }
 
 func addPlayer(context *game.Context) *content.Player {
 	currentUser, err := user.Current()
-	playerName := ""
-	if err == nil {
-		userName := currentUser.Username
-		lastIdx := strings.LastIndexAny(userName, "/\\@")
-		if lastIdx != -1 {
-			userName = userName[lastIdx+1:]
-		}
-		playerName = userName
+	if err != nil {
+		fmt.Println("Error retrieving current user:", err)
+		return content.NewPlayer("Hero")
+	}
+	userName := currentUser.Username
+	lastIdx := strings.LastIndexAny(userName, "/\\@")
+	if lastIdx != -1 {
+		userName = userName[lastIdx+1:]
 	}
 
-	worldX := worldSize/2
-	worldY := worldSize/2
+	worldX := worldSize / 2
+	worldY := worldSize / 2
 
-	player := content.NewPlayer(playerName)
+	player := content.NewPlayer(userName)
 	context.World.Add(
 		player,
 		worldX,
 		worldY,
 		true,
-		)
+	)
 
 	player.Inventory = []game.Item{
 		content.NewSwordWooden(),
@@ -127,7 +127,7 @@ func addEnemies(context *game.Context) []game.Entity {
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		enemies = append(enemies, goblin)
 	}
 
@@ -144,7 +144,7 @@ func addLocations(context *game.Context) []game.Entity {
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, chest)
 	}
 
@@ -155,7 +155,7 @@ func addLocations(context *game.Context) []game.Entity {
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, workbench)
 	}
 
@@ -166,43 +166,40 @@ func addLocations(context *game.Context) []game.Entity {
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, woodDeposit)
 	}
 
 	for range locationCountDepositStone {
-		stoneDeposit :=
-		content.NewDepositRock(depositResCountMin, depositResCountMax)
+		stoneDeposit := content.NewDepositRock(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			stoneDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, stoneDeposit)
 	}
 
 	for range locationCountDepositIron {
-		ironDeposit :=
-		content.NewDepositIronVein(depositResCountMin, depositResCountMax)
+		ironDeposit := content.NewDepositIronVein(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			ironDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, ironDeposit)
 	}
 
 	for range locationCountDepositGold {
-		goldDeposit :=
-		content.NewDepositGoldVein(depositResCountMin, depositResCountMax)
+		goldDeposit := content.NewDepositGoldVein(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			goldDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
 			true,
-			)
+		)
 		locations = append(locations, goldDeposit)
 	}
 

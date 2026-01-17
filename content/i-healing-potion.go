@@ -1,22 +1,21 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"text-adventure-game/game"
 )
 
 type HealingPotion struct {
-	Prefix string
+	Prefix    string
 	Magnitude int
 }
 
 func NewHealingPotion(prefix string, magnitude int) *HealingPotion {
 	return &HealingPotion{
-		Prefix: prefix,
+		Prefix:    prefix,
 		Magnitude: magnitude,
 	}
 }
-
 
 func NewHealingPotionMinor() *HealingPotion {
 	return NewHealingPotion("Minor", 20)

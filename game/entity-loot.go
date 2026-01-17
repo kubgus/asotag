@@ -1,6 +1,6 @@
 package game
 
-import "text-adventure-game/utils"
+import "asotag/utils"
 
 type EntityLoot interface {
 	GetLoot(user Entity) []Item

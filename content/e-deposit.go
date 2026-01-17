@@ -1,21 +1,21 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 type Deposit struct {
-	Name string
-	Type Material
+	Name   string
+	Type   Material
 	Amount int
 }
 
 func NewDeposit(name string, depositType Material, amount int) *Deposit {
 	return &Deposit{
-		Name: name,
-		Type: depositType,
+		Name:   name,
+		Type:   depositType,
 		Amount: amount,
 	}
 }

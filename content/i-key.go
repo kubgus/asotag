@@ -1,11 +1,11 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"text-adventure-game/game"
 )
 
-type Key struct {}
+type Key struct{}
 
 func NewKey() *Key {
 	return &Key{}

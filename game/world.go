@@ -1,8 +1,8 @@
 package game
 
 import (
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/utils"
 )
 
 type Point struct {
@@ -15,15 +15,15 @@ type world struct {
 
 	EntityOrder []Entity
 
-	Size      int
+	Size int
 }
 
 func NewWorld(size int) *world {
 	return &world{
-		Positions: make(map[Entity]Point),
-		Occupants: make(map[Point][]Entity),
+		Positions:   make(map[Entity]Point),
+		Occupants:   make(map[Point][]Entity),
 		EntityOrder: make([]Entity, 0),
-		Size:      size,
+		Size:        size,
 	}
 }
 
@@ -81,7 +81,6 @@ func (w *world) Move(entity Entity, x, y int) {
 	w.Add(entity, x, y, false)
 }
 
-
 func (w *world) MoveInDirection(entity Entity, dx, dy int) (string, bool) {
 	pos, ok := w.Positions[entity]
 	if !ok {
@@ -136,7 +135,7 @@ func (w *world) debugPrint(highlightEntity Entity) {
 
 	for y := 0; y < w.Size; y++ {
 		// Y-axis coordinate
-		fmt.Printf("%d " + ColTooltip("│"), y%10)
+		fmt.Printf("%d "+ColTooltip("│"), y%10)
 
 		for x := 0; x < w.Size; x++ {
 			occupants := w.Occupants[Point{x, y}]
@@ -159,9 +158,9 @@ func (w *world) debugPrint(highlightEntity Entity) {
 				}
 
 				symbol := color +
-				utils.ColorFgBold +
-				utils.StripANSI(first.GetName())[:1] +
-				utils.ColorReset
+					utils.ColorFgBold +
+					utils.StripANSI(first.GetName())[:1] +
+					utils.ColorReset
 
 				// If multiple entities are here, highlight it
 				if len(occupants) >= 5 {

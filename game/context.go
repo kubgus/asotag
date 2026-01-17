@@ -1,8 +1,8 @@
 package game
 
 import (
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/utils"
 	"time"
 )
 
@@ -22,13 +22,13 @@ func (c *Context) ExecuteRound() {
 		if entityActive, ok := entity.(EntityActive); ok {
 			entityActive.BeforeTurn(c)
 
-			time.Sleep(time.Duration(500 + utils.RandIntInRange(0, 500)) * time.Millisecond)
+			time.Sleep(time.Duration(500+utils.RandIntInRange(0, 500)) * time.Millisecond)
 
 			fmt.Printf("%v %v's turn %v\n\n",
 				ColTooltip("======>"),
 				entity.GetName(),
 				ColTooltip("<======"),
-				)
+			)
 
 			for {
 				response, endTurn := entityActive.OnTurn(c)

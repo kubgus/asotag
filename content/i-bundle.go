@@ -1,8 +1,8 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"text-adventure-game/game"
 )
 
 type Bundle struct {
@@ -23,7 +23,7 @@ func (b *Bundle) GetDesc() string {
 	return fmt.Sprintf(
 		"Contains: %v. Can be used for crafting or trading.",
 		game.ListItems(b.Items),
-		)
+	)
 }
 
 func (b *Bundle) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
@@ -47,7 +47,7 @@ func (b *Bundle) Use(user, target game.Entity, _ *game.Context) (string, bool, b
 			user.GetName(),
 			game.ListItems(b.Items),
 			craftedItem.GetName(),
-			), true, true
+		), true, true
 	}
 
 	if craftingAllowed {
@@ -55,7 +55,7 @@ func (b *Bundle) Use(user, target game.Entity, _ *game.Context) (string, bool, b
 			"%v tries to craft something out of %v, but cannot figure anything out.\n",
 			user.GetName(),
 			game.ListItems(b.Items),
-			), false, false
+		), false, false
 	}
 
 	return game.SnipCannotUseItemOn(user, target, b), false, false

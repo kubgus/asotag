@@ -1,26 +1,25 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 var (
 	lootTableChest = map[game.Item]int{
 		NewHealingPotionMinor(): 50,
-		NewHealingPotionMajor(): 20,
-		NewSpeedPotionMinor(): 30,
-		NewSpeedPotionMajor(): 10,
-		NewSwordIron(): 10,
-		NewSpearIron(): 10,
-		NewKey(): 40,
+		NewKey():                30,
+		NewSpeedPotion():        30,
+		NewHealingPotionMajor(): 15,
+		NewSwordIron():          5,
+		NewSpearIron():          5,
 	}
 )
 
 type Chest struct {
 	IsUnlocked bool
-	Contents []game.Item
+	Contents   []game.Item
 }
 
 func NewChest() *Chest {
@@ -28,7 +27,7 @@ func NewChest() *Chest {
 
 	return &Chest{
 		IsUnlocked: isUnlocked,
-		Contents: game.GetRandomLoot(lootTableChest, utils.RandIntInRange(1, 4)),
+		Contents:   game.GetRandomLoot(lootTableChest, utils.RandIntInRange(1, 4)),
 	}
 }
 
@@ -50,7 +49,7 @@ func (c *Chest) GetDesc(user game.Entity) string {
 	if c.IsUnlocked {
 		if len(c.Contents) > 0 {
 			return fmt.Sprintf(
-				"%v is unlocked and contains: %v.\n",
+				"%v is unlocked and contains: %v. Can be mined to loot.\n",
 				c.GetName(),
 				game.ListItems(c.Contents),
 			)

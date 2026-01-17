@@ -1,6 +1,7 @@
 package content
 
 type Material int
+
 // Ordered by increasing strength/durability
 const (
 	MaterialWood Material = iota

@@ -1,20 +1,20 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 type Spear struct {
-	Name string
+	Name      string
 	MinDamage int
 	MaxDamage int
 }
 
 func NewSpear(name string, minDamage, maxDamage int) *Spear {
 	return &Spear{
-		Name: name,
+		Name:      name,
 		MinDamage: minDamage,
 		MaxDamage: maxDamage,
 	}
@@ -44,7 +44,7 @@ func (s *Spear) Use(user, _ game.Entity, context *game.Context) (string, bool, b
 	fmt.Printf(
 		game.ColTooltip("Select a direction to throw: %v\n"),
 		game.ListDirections(),
-		)
+	)
 	input := game.Input()
 	dx, dy, valid := game.DirToDelta(input)
 	if !valid {
@@ -57,8 +57,8 @@ func (s *Spear) Use(user, _ game.Entity, context *game.Context) (string, bool, b
 	}
 
 	targets := context.World.GetEntitiesAt(
-		px + dx,
-		py + dy,
+		px+dx,
+		py+dy,
 	)
 
 	target, ok := utils.RandChoice(targets)

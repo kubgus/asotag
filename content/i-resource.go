@@ -1,8 +1,8 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"text-adventure-game/game"
 )
 
 type Resource struct {
@@ -23,7 +23,7 @@ func (r *Resource) GetDesc() string {
 	return fmt.Sprintf(
 		"A chunk of %v. Can be used for crafting or trading.",
 		game.ColItem(r.Type.String()),
-		)
+	)
 }
 
 func (r *Resource) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {

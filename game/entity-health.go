@@ -7,10 +7,13 @@ type EntityHealth interface {
 	AddHealth(amount int) (response string, alive bool)
 }
 
-func GetHealthStatusResponse[T interface{ Entity; EntityHealth }](entity T) string {
+func GetHealthStatusResponse[T interface {
+	Entity
+	EntityHealth
+}](entity T) string {
 	return fmt.Sprintf(
 		"%v is now at %v.",
 		entity.GetName(),
 		FormatHealth(entity.GetHealth(), true),
-		)
+	)
 }

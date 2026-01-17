@@ -8,7 +8,7 @@ func SnipCannotUseItemOn(user, target Entity, item Item) string {
 		user.GetName(),
 		item.GetName(),
 		target.GetName(),
-		)
+	)
 }
 
 func SnipItemCannotBeUsedBy(user Entity, item Item) string {
@@ -16,12 +16,12 @@ func SnipItemCannotBeUsedBy(user Entity, item Item) string {
 		"%v cannot use %v.\n",
 		user.GetName(),
 		item.GetName(),
-		)
+	)
 }
 
 func SnipInvalidDirection(input string) string {
 	return fmt.Sprintf(
 		"Invalid direction. (%v)\n",
 		ColTooltip(input),
-		)
+	)
 }

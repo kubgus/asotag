@@ -1,9 +1,9 @@
 package game
 
 import (
+	"asotag/utils"
 	"fmt"
 	"strconv"
-	"text-adventure-game/utils"
 )
 
 type Entity interface {
@@ -24,7 +24,7 @@ func ListEntities(entities []Entity) string {
 			"%v(%v)",
 			entity.GetName(),
 			entity.GetStatus(),
-			))
+		))
 	}
 	return utils.JoinWithLast(keys, ", ", " and ")
 }
@@ -40,6 +40,6 @@ func ListOrderedEntities(items []Entity) string {
 			ColAction(strconv.Itoa(i)),
 			entity.GetName(),
 			entity.GetStatus(),
-			)
+		)
 	})
 }

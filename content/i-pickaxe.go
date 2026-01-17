@@ -1,8 +1,8 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"text-adventure-game/game"
 )
 
 const (
@@ -60,7 +60,7 @@ func (p *Pickaxe) Use(user, target game.Entity, _ *game.Context) (string, bool, 
 		p.GetName(),
 		target.GetName(),
 		game.ListItems(loot),
-		), true, false
+	), true, false
 }
 
 func (p *Pickaxe) MaxMineable() Material {

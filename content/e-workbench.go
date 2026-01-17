@@ -1,9 +1,9 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 var (
@@ -100,9 +100,9 @@ func (w *Workbench) GetDesc(user game.Entity) string {
 				"%v <- %v",
 				item.GetName(),
 				game.ListItems(w.Recipes[item]),
-				)
+			)
 		},
-		)
+	)
 
 	return fmt.Sprintf(
 		"%v\n%v\n",

@@ -1,9 +1,9 @@
 package game
 
 import (
+	"asotag/utils"
 	"fmt"
 	"strconv"
-	"text-adventure-game/utils"
 )
 
 type Item interface {
@@ -37,7 +37,7 @@ func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string) string 
 			item.GetName(),
 			ColTooltip("-"),
 			f(i, item),
-			)
+		)
 	})
 }
 

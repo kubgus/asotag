@@ -1,38 +1,37 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
 	"math/rand/v2"
 	"slices"
 	"sort"
 	"strconv"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 const (
-	defaultPlayerName = "Hero"
+	defaultPlayerName   = "Hero"
 	defaultPlayerHealth = 100
 
-	maxLooksPerTurnPlayer = 2
+	maxLooksPerTurnPlayer           = 2
 	lookActionDiscoveryChancePlayer = 0.8
 
-	cheatCommand = "UUDDLRLRBA"
+	cheatCommand     = "UUDDLRLRBA"
 	cheatHealthBoost = 200
 )
 
 type Player struct {
-	Name string
+	Name   string
 	Health int
 
 	Inventory []game.Item
 
 	// Trackers
 	looksThisTurn int
-	movesThisTurn int
 
 	// Potion effects
-	extraMoves int
+	speedPotion bool
 }
 
 func NewPlayer(name string) *Player {
@@ -42,7 +41,7 @@ func NewPlayer(name string) *Player {
 	}
 
 	return &Player{
-		Name: nameToUse,
+		Name:   nameToUse,
 		Health: defaultPlayerHealth,
 
 		Inventory: []game.Item{},
@@ -68,7 +67,7 @@ func (p *Player) AddHealth(amount int) (string, bool) {
 		return fmt.Sprintf(
 			"%v has been knocked out.",
 			p.GetName(),
-			), false
+		), false
 	}
 
 	return game.GetHealthStatusResponse(p), true
@@ -80,17 +79,16 @@ func (p *Player) GetDesc(user game.Entity) string {
 			"%v looks at %v with a puzzled expression.\n",
 			p.GetName(),
 			user.GetName(),
-			)
+		)
 	}
 	return fmt.Sprintf(
 		"%v contemplates existence.\n",
 		p.GetName(),
-		)
+	)
 }
 
 func (p *Player) BeforeTurn(context *game.Context) {
 	p.looksThisTurn = 0
-	p.movesThisTurn = 0
 }
 
 func (p *Player) OnTurn(context *game.Context) (string, bool) {
@@ -98,21 +96,13 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 		"%v %v\n",
 		game.ColTooltip("Nearby:"),
 		game.ListEntities(context.World.GetOccupantsSameTile(p)),
-		)
+	)
 
 	fmt.Printf(
 		"%v %v\n",
 		game.ColTooltip("Actions:"),
 		listActions(actions),
-		)
-
-	if p.extraMoves > 0 {
-		fmt.Printf(
-			"%v %v\n",
-			game.ColTooltip("Extra Moves:"),
-			game.ColSystem(strconv.Itoa(p.extraMoves)),
-		)
-	}
+	)
 
 	fmt.Println("\nChoose your action:")
 	input := game.Input()
@@ -126,32 +116,29 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 		return fmt.Sprintf(
 			"Invalid action. (%v)\n",
 			game.ColTooltip(input),
-			), false
+		), false
 	}
 
 	return action(p, context)
 }
 
-func (p *Player) ApplySpeedPotion(magnitude int) {
-	p.extraMoves += magnitude
+func (p *Player) ApplySpeedPotion() {
+	p.speedPotion = true
 }
 
 func (p *Player) CollectLoot(loot []game.Item) (string, bool) {
-	if len(loot) == 0 {
-		return "", false
+	if len(loot) > 0 {
+		p.Inventory = append(p.Inventory, loot...)
 	}
-
-	p.Inventory = append(p.Inventory, loot...)
 
 	return fmt.Sprintf(
 		"%v collects %v.\n",
 		p.GetName(),
 		game.ListItems(loot),
-		), true
+	), true
 }
 
 func (p *Player) ApplyCheats(context *game.Context) string {
-	context.CheatRevealMap = true
 	if px, py, ok := context.World.GetEntityPos(p); ok {
 		context.World.Add(NewWorkbench(), px, py, false)
 
@@ -159,10 +146,14 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 		context.World.Add(NewDepositRock(50, 100), px, py, false)
 		context.World.Add(NewDepositIronVein(50, 100), px, py, false)
 		context.World.Add(NewDepositGoldVein(50, 100), px, py, false)
+
+		for range 5 {
+			unlockedChest := NewChest()
+			unlockedChest.IsUnlocked = true
+			context.World.Add(unlockedChest, px, py, false)
+		}
 	}
-	originalInventoryLen := len(p.Inventory)
-	p.Inventory = append(
-		p.Inventory,
+	response, _ := p.CollectLoot([]game.Item{
 		NewSwordGold(),
 		NewPickaxe(MaterialGold),
 		NewHealingPotionSuperior(),
@@ -170,15 +161,15 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),
-		)
+		NewSpeedPotion(),
+	})
+	context.CheatRevealMap = true
 	return fmt.Sprintf(
-		"%v activated a cheat code!\n" +
-		"Map revealed!\n" +
-		"A workbench appears nearby!\n" +
-		"Gained %v!\n",
+		"%v activates a cheat code!\n"+
+			"%v",
 		p.GetName(),
-		game.ListItems(p.Inventory[originalInventoryLen:]),
-		)
+		response,
+	)
 }
 
 type actionFunc func(player *Player, context *game.Context) (string, bool)
@@ -200,7 +191,7 @@ var actions = map[string]actionFunc{
 					}
 					return item.GetDesc()
 				},
-				))
+			))
 			input := game.Input()
 
 			index, err := strconv.Atoi(input)
@@ -214,7 +205,7 @@ var actions = map[string]actionFunc{
 				fmt.Printf(
 					"%v deselected for bundling.\n\n",
 					player.Inventory[index].GetName(),
-					)
+				)
 
 				continue
 			}
@@ -235,7 +226,7 @@ var actions = map[string]actionFunc{
 					"%v unbundles %v.\n",
 					player.GetName(),
 					game.ListItems(newBundle.Items),
-					), false
+				), false
 			}
 
 			isInvalidInput := err != nil || index < 0 || index >= len(player.Inventory)
@@ -269,7 +260,7 @@ var actions = map[string]actionFunc{
 					wording = "creates a"
 					newBundle = NewBundle(
 						items,
-						)
+					)
 					player.Inventory = append(player.Inventory, newBundle)
 				} else {
 					wording = "fills the"
@@ -282,7 +273,7 @@ var actions = map[string]actionFunc{
 					wording,
 					newBundle.GetName(),
 					game.ListItems(newBundle.Items),
-					), false
+				), false
 			}
 
 			bundleIdxs = append(bundleIdxs, index)
@@ -291,7 +282,7 @@ var actions = map[string]actionFunc{
 				"%v selected for bundling.\n%v\n\n",
 				player.Inventory[index].GetName(),
 				game.ColTooltip("(Enter 'x' to finish bundling)"),
-				)
+			)
 		}
 	},
 	"inventory": func(player *Player, context *game.Context) (string, bool) {
@@ -320,7 +311,7 @@ var actions = map[string]actionFunc{
 			return fmt.Sprintf(
 				"Invalid item selection. (%v)\n",
 				game.ColTooltip(input),
-				), false
+			), false
 		}
 		item := player.Inventory[index]
 
@@ -335,8 +326,8 @@ var actions = map[string]actionFunc{
 		if err != nil || targetIndex < 0 || targetIndex >= len(neighbors) {
 			return fmt.Sprintf(
 				"Invalid target selection. (%v)\n",
-				targetInput,
-				), false
+				game.ColTooltip(targetInput),
+			), false
 		}
 		target := neighbors[targetIndex]
 
@@ -346,7 +337,7 @@ var actions = map[string]actionFunc{
 			result += fmt.Sprintf(
 				"%v removed from inventory.\n",
 				item.GetName(),
-				)
+			)
 
 			player.Inventory = append(
 				player.Inventory[:index],
@@ -372,7 +363,7 @@ var actions = map[string]actionFunc{
 			return fmt.Sprintf(
 				"Invalid selection. (%v)\n",
 				game.ColTooltip(input),
-				), false
+			), false
 		}
 
 		entity := neighbors[index]
@@ -392,20 +383,18 @@ var actions = map[string]actionFunc{
 		}
 
 		response, ok := context.World.MoveInDirection(player, dx, dy)
-		player.movesThisTurn++
 
-		if player.movesThisTurn > 1 {
-			player.extraMoves--
-		}
+		speedPotionActive := player.speedPotion
+		player.speedPotion = false
 
-		return response, ok && player.extraMoves == 0
+		return response, ok && !speedPotionActive
 	},
 	"look": func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {
 			return fmt.Sprintf(
 				"%v's eyes are already strained from looking around this turn.\n",
 				player.GetName(),
-				), false
+			), false
 		}
 
 		fmt.Printf(
@@ -465,7 +454,7 @@ var actions = map[string]actionFunc{
 		return fmt.Sprintf(
 			"%v sees nothing of interest in that direction.\n",
 			player.GetName(),
-			), false
+		), false
 	},
 	"wait": func(player *Player, context *game.Context) (string, bool) {
 		return fmt.Sprintf("%v waits.\n", player.GetName()), true

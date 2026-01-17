@@ -1,15 +1,15 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
 	"math"
 	"math/rand/v2"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 const (
-	defaultGoblinName = "Goblin"
+	defaultGoblinName   = "Goblin"
 	defaultGoblinHealth = 30
 	defaultGoblinDamage = 5
 
@@ -17,28 +17,29 @@ const (
 
 	dropChanceGoblin = 0.25
 
-	moveChanceGoblinChase = 0.6
+	moveChanceGoblinChase  = 0.6
 	moveChanceGoblinRandom = 0.2
-	moveChanceGoblinIdle = 0.2
+	moveChanceGoblinIdle   = 0.2
 )
 
 var (
 	lootTableGoblin = map[game.Item]int{
-		NewKey(): 30,
+		NewKey():                           30,
 		NewHealingPotion("Suspicious", 15): 70,
 	}
 
+	takenGoblinSurnames  = map[string]bool{}
 	randomGoblinSurnames = []string{
 		"Archibald",
 		"Blot",
-		"Cain",
+		"Cook",
 		"Drake",
-		"Eek",
+		"Elph",
 		"Fenrir",
 		"Grok",
-		"Hob",
+		"Hugo",
 		"Jinx",
-		"Krag",
+		"Kip",
 		"Lug",
 		"Muck",
 		"Nibble",
@@ -47,12 +48,9 @@ var (
 		"Quill",
 		"Rattle",
 		"Shank",
-		"Twitch",
-		"Ugg",
-		"Vex",
-		"Wonka",
-		"Xar",
-		"Yap",
+		"Till",
+		"Urk",
+		"Vorp",
 		"Zig",
 	}
 )
@@ -63,21 +61,30 @@ var (
 
 // TODO: Implement speed potion
 type Goblin struct {
-	Name string
+	Name   string
 	Health int
 	Damage int
+
+	// Potion effects
+	speedPotion bool
 }
 
 func NewGoblin() *Goblin {
 	surname := ""
 	if rand.Float32() < surnameChanceGoblin {
-		surname = fmt.Sprintf(" %v",
-			randomGoblinSurnames[rand.IntN(len(randomGoblinSurnames))],
-			)
+		var randomSurname string
+		for {
+			randomSurname, _ = utils.RandChoice(randomGoblinSurnames)
+			if !takenGoblinSurnames[randomSurname] && len(takenGoblinSurnames) < len(randomGoblinSurnames) {
+				takenGoblinSurnames[randomSurname] = true
+				break
+			}
+		}
+		surname = fmt.Sprintf(" %v", randomSurname)
 	}
 
 	return &Goblin{
-		Name: defaultGoblinName + surname,
+		Name:   defaultGoblinName + surname,
 		Health: defaultGoblinHealth,
 		Damage: defaultGoblinDamage,
 	}
@@ -96,7 +103,7 @@ func (g *Goblin) GetDesc(user game.Entity) string {
 		"%v tries to strike up a conversation with %v, but it seems uninterested in talking.\n",
 		user.GetName(),
 		g.GetName(),
-		)
+	)
 }
 
 func (g *Goblin) GetHealth() int {
@@ -110,7 +117,7 @@ func (g *Goblin) AddHealth(amount int) (string, bool) {
 		return fmt.Sprintf(
 			"%v has perished.",
 			g.GetName(),
-			), false
+		), false
 	}
 
 	return game.GetHealthStatusResponse(g), true
@@ -120,7 +127,7 @@ func (g *Goblin) GetLoot(user game.Entity) []game.Item {
 	return game.GetRandomLoot(lootTableGoblin, utils.RandIntInRange(0, 1))
 }
 
-func (g *Goblin) BeforeTurn(context *game.Context) { }
+func (g *Goblin) BeforeTurn(context *game.Context) {}
 
 func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 	occupants := context.World.GetOccupantsSameTile(g)
@@ -137,19 +144,26 @@ func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 				entity.GetName(),
 				game.FormatDamage(g.Damage, false),
 				response,
-				), true
+			), true
 		}
 	}
 
+	speedPotionActive := g.speedPotion
 	rgn := rand.Float32()
 	switch {
 	case rgn < moveChanceGoblinRandom:
-		return g.moveRandomly(context), true
+		g.speedPotion = false
+		return g.moveRandomly(context), true && !speedPotionActive
 	case rgn < moveChanceGoblinRandom+moveChanceGoblinChase:
-		return g.moveTowardsClosestNonGoblin(context), true
+		g.speedPotion = false
+		return g.moveTowardsClosestNonGoblin(context), true && !speedPotionActive
 	default:
 		return fmt.Sprintf("%v stays still, observing the surroundings.\n", g.GetName()), true
 	}
+}
+
+func (g *Goblin) ApplySpeedPotion() {
+	g.speedPotion = true
 }
 
 func (g *Goblin) moveRandomly(context *game.Context) string {
@@ -201,8 +215,16 @@ func (g *Goblin) getDirectionToClosestNonGoblin(context *game.Context) (int, int
 	targetPos := context.World.Positions[target]
 
 	dx, dy := 0, 0
-	if targetPos.X > currentPos.X { dx = 1 } else if targetPos.X < currentPos.X { dx = -1 }
-	if targetPos.Y > currentPos.Y { dy = 1 } else if targetPos.Y < currentPos.Y { dy = -1 }
+	if targetPos.X > currentPos.X {
+		dx = 1
+	} else if targetPos.X < currentPos.X {
+		dx = -1
+	}
+	if targetPos.Y > currentPos.Y {
+		dy = 1
+	} else if targetPos.Y < currentPos.Y {
+		dy = -1
+	}
 
 	return dx, dy, target
 }

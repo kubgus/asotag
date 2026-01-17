@@ -1,20 +1,20 @@
 package content
 
 import (
+	"asotag/game"
+	"asotag/utils"
 	"fmt"
-	"text-adventure-game/game"
-	"text-adventure-game/utils"
 )
 
 type Sword struct {
-	Name string
+	Name      string
 	MinDamage int
 	MaxDamage int
 }
 
 func NewSword(name string, minDamage, maxDamage int) *Sword {
 	return &Sword{
-		Name: name,
+		Name:      name,
 		MinDamage: minDamage,
 		MaxDamage: maxDamage,
 	}
@@ -45,7 +45,7 @@ func (s *Sword) GetDesc() string {
 		"Deals %v to %v close-range damage.",
 		game.FormatDamage(s.MinDamage, false),
 		game.FormatDamage(s.MaxDamage, false),
-		)
+	)
 }
 
 func (s *Sword) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
@@ -78,5 +78,5 @@ func (s *Sword) Use(user, target game.Entity, _ *game.Context) (string, bool, bo
 		s.GetName(),
 		game.FormatDamage(damage, false),
 		response,
-		), true, false
+	), true, false
 }

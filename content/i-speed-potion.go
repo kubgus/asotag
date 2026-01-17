@@ -1,40 +1,22 @@
 package content
 
 import (
+	"asotag/game"
 	"fmt"
-	"strconv"
-	"text-adventure-game/game"
 )
 
-type SpeedPotion struct {
-	Prefix string
-	Magnitude int
-}
+type SpeedPotion struct{}
 
-func NewSpeedPotion(prefix string, magnitude int) *SpeedPotion {
-	return &SpeedPotion{
-		Prefix: prefix,
-		Magnitude: magnitude,
-	}
-}
-
-func NewSpeedPotionMinor() *SpeedPotion {
-	return NewSpeedPotion("Minor", 1)
-}
-
-func NewSpeedPotionMajor() *SpeedPotion {
-	return NewSpeedPotion("Major", 2)
+func NewSpeedPotion() *SpeedPotion {
+	return &SpeedPotion{}
 }
 
 func (p *SpeedPotion) GetName() string {
-	return game.ColItem(fmt.Sprintf("%v Speed Potion", p.Prefix))
+	return game.ColItem("Speed Potion")
 }
 
 func (p *SpeedPotion) GetDesc() string {
-	return fmt.Sprintf(
-		"Allows the use to move %v extra spaces in a single turn when used.",
-		game.ColItem(strconv.Itoa(p.Magnitude)),
-		)
+	return "Makes next move not end turn."
 }
 
 func (p *SpeedPotion) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
@@ -43,13 +25,13 @@ func (p *SpeedPotion) Use(user, target game.Entity, _ *game.Context) (string, bo
 		return game.SnipCannotUseItemOn(user, target, p), false, false
 	}
 
-	targetSpeedPotionable.ApplySpeedPotion(p.Magnitude)
+	targetSpeedPotionable.ApplySpeedPotion()
 
 	return fmt.Sprintf(
-		"%v uses %v on %v, granting the ability to move %v extra spaces in a single turn!\n",
+		"%v uses %v on %v. %v's next move won't end their turn!\n",
 		user.GetName(),
 		p.GetName(),
 		target.GetName(),
-		game.ColItem(strconv.Itoa(p.Magnitude)),
+		target.GetName(),
 	), true, true
 }
