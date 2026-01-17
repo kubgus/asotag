@@ -13,10 +13,10 @@ func RandProbability(prob float64) bool {
 	return rand.Float64() < prob
 }
 
-func RandChoice[T any](choices []T) T {
+func RandChoice[T any](choices []T) (T, bool) {
 	if len(choices) == 0 {
 		var zero T
-		return zero
+		return zero, false
 	}
-	return choices[rand.IntN(len(choices))]
+	return choices[rand.IntN(len(choices))], true
 }

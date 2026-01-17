@@ -33,6 +33,15 @@ var (
 			NewResource(MaterialWood),
 		},
 
+		NewSpear("Wooden Spear", 4, 8): {
+			NewResource(MaterialWood),
+			NewResource(MaterialWood),
+		},
+		NewSpear("Iron Spear", 11, 18): {
+			NewResource(MaterialIron),
+			NewResource(MaterialWood),
+		},
+
 		NewPickaxe(MaterialWood): {
 			NewResource(MaterialWood),
 			NewResource(MaterialWood),

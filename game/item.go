@@ -10,7 +10,7 @@ type Item interface {
 	GetName() string
 	GetDesc() string
 
-	Use(user, target Entity) (response string, ok, consume bool)
+	Use(user, target Entity, context *Context) (response string, ok, consume bool)
 }
 
 func ListItems(items []Item) string {

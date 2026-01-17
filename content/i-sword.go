@@ -2,9 +2,8 @@ package content
 
 import (
 	"fmt"
-	"math/rand/v2"
-	"strconv"
 	"text-adventure-game/game"
+	"text-adventure-game/utils"
 )
 
 type Sword struct {
@@ -28,18 +27,18 @@ func (s *Sword) GetName() string {
 func (s *Sword) GetDesc() string {
 	return fmt.Sprintf(
 		"Deals %v to %v close-range damage.",
-		game.ColDamage(strconv.Itoa(s.MinDamage)),
-		game.ColDamage(strconv.Itoa(s.MaxDamage)),
+		game.FormatDamage(s.MinDamage, false),
+		game.FormatDamage(s.MaxDamage, false),
 		)
 }
 
-func (s *Sword) Use(user, target game.Entity) (string, bool, bool) {
+func (s *Sword) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
 	targetHealth, ok := target.(game.EntityHealth)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, s), false, false
 	}
 
-	damage := rand.IntN(s.MaxDamage - s.MinDamage + 1) + s.MinDamage
+	damage := utils.RandIntInRange(s.MinDamage, s.MaxDamage)
 
 	response, alive := targetHealth.AddHealth(-damage)
 
@@ -61,7 +60,7 @@ func (s *Sword) Use(user, target game.Entity) (string, bool, bool) {
 		user.GetName(),
 		target.GetName(),
 		s.GetName(),
-		game.ColDamage(strconv.Itoa(damage)),
+		game.FormatDamage(damage, false),
 		response,
 		), true, false
 }

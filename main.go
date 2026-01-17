@@ -15,7 +15,7 @@ const (
 
 	enemyCountGoblin = 7
 
-	locationCountChest = 3
+	locationCountChest = 5
 	locationCountWorkbench = 2
 	locationCountDepositWood = 15
 	locationCountDepositStone = 7
@@ -109,8 +109,9 @@ func addPlayer(context *game.Context) *content.Player {
 		)
 
 	player.Inventory = []game.Item{
-		content.NewSword("Stick", 4, 8),
+		content.NewSword("Really Good Stick", 1, 10),
 		content.NewPickaxe(content.MaterialWood),
+		content.NewSpear("Wooden Spear", 4, 8),
 		content.NewHealingPotion("Minor", 20),
 	}
 
@@ -143,7 +144,7 @@ func addLocations(context *game.Context) []game.Entity {
 			chest,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, chest)
 	}
@@ -154,7 +155,7 @@ func addLocations(context *game.Context) []game.Entity {
 			workbench,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, workbench)
 	}
@@ -169,7 +170,7 @@ func addLocations(context *game.Context) []game.Entity {
 			woodDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, woodDeposit)
 	}
@@ -184,7 +185,7 @@ func addLocations(context *game.Context) []game.Entity {
 			stoneDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, stoneDeposit)
 	}
@@ -199,7 +200,7 @@ func addLocations(context *game.Context) []game.Entity {
 			ironDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, ironDeposit)
 	}
@@ -214,7 +215,7 @@ func addLocations(context *game.Context) []game.Entity {
 			goldDeposit,
 			rand.IntN(worldSize),
 			rand.IntN(worldSize),
-			false,
+			true,
 			)
 		locations = append(locations, goldDeposit)
 	}

@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"math"
+	"text-adventure-game/utils"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func (c *Context) ExecuteRound() {
 		if entityActive, ok := entity.(EntityActive); ok {
 			entityActive.BeforeTurn(c)
 
-			time.Sleep(time.Duration((math.Round(6000 / float64(len(c.World.EntityOrder))))) * time.Millisecond)
+			time.Sleep(time.Duration(500 + utils.RandIntInRange(0, 500)) * time.Millisecond)
 
 			fmt.Printf("%v %v's turn %v\n\n",
 				ColTooltip("======>"),

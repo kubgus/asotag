@@ -29,6 +29,7 @@ type Player struct {
 
 	// Trackers
 	looksThisTurn int
+	movesThisTurn int
 
 	// Potion effects
 	extraMoves int
@@ -82,13 +83,14 @@ func (p *Player) GetDesc(user game.Entity) string {
 			)
 	}
 	return fmt.Sprintf(
-		"%v contemplates exsistence.\n",
+		"%v contemplates existence.\n",
 		p.GetName(),
 		)
 }
 
 func (p *Player) BeforeTurn(context *game.Context) {
 	p.looksThisTurn = 0
+	p.movesThisTurn = 0
 }
 
 func (p *Player) OnTurn(context *game.Context) (string, bool) {
@@ -338,7 +340,7 @@ var actions = map[string]actionFunc{
 		}
 		target := neighbors[targetIndex]
 
-		result, ok, consume := item.Use(player, target)
+		result, ok, consume := item.Use(player, target, context)
 
 		if consume {
 			result += fmt.Sprintf(
@@ -386,18 +388,17 @@ var actions = map[string]actionFunc{
 
 		dx, dy, valid := game.DirToDelta(input)
 		if !valid {
-			return fmt.Sprintf(
-				"Invalid direction. (%v)\n",
-				game.ColTooltip(input),
-				), false
+			return game.SnipInvalidDirection(input), false
 		}
 
 		response, ok := context.World.MoveInDirection(player, dx, dy)
-		hasExtraMove := player.extraMoves > 0
-		if ok && hasExtraMove {
+		player.movesThisTurn++
+
+		if player.movesThisTurn > 1 {
 			player.extraMoves--
 		}
-		return response, ok && !hasExtraMove
+
+		return response, ok && player.extraMoves == 0
 	},
 	"look": func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {

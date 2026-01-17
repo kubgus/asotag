@@ -19,7 +19,7 @@ func (k *Key) GetDesc() string {
 	return "A small key that can unlock chests."
 }
 
-func (k *Key) Use(user, target game.Entity) (string, bool, bool) {
+func (k *Key) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
 	chest, ok := target.(*Chest)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, k), false, false
@@ -28,19 +28,12 @@ func (k *Key) Use(user, target game.Entity) (string, bool, bool) {
 		return game.SnipCannotUseItemOn(user, target, k), false, false
 	}
 
-	loot := chest.GetLoot(user)
-
-	if player, ok := user.(*Player); ok {
-		player.CollectLoot(loot)
-	} else {
-		return game.SnipItemCannotBeUsedBy(user, k), false, false
-	}
+	chest.IsUnlocked = true
 
 	return fmt.Sprintf(
-		"%v uses %v to unlock %v and finds: %v.\n",
+		"%v uses %v to unlock %v.\n",
 		user.GetName(),
 		k.GetName(),
 		target.GetName(),
-		game.ListItems(loot),
-	), true, true
+	), false, true
 }

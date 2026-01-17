@@ -31,16 +31,22 @@ func (p *Pickaxe) GetDesc() string {
 	)
 }
 
-func (p *Pickaxe) Use(user, target game.Entity) (string, bool, bool) {
-	deposit, ok := target.(*Deposit)
-	if !ok {
-		return game.SnipCannotUseItemOn(user, target, p), false, false
-	}
-	if deposit.Type > p.MaxMineable() || deposit.Amount == 0 {
-		return game.SnipCannotUseItemOn(user, target, p), false, false
-	}
+func (p *Pickaxe) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+	var loot []game.Item
 
-	loot := deposit.GetLoot(user)
+	if deposit, ok := target.(*Deposit); ok {
+		if deposit.Type > p.MaxMineable() || deposit.Amount == 0 {
+			return game.SnipCannotUseItemOn(user, target, p), false, false
+		}
+		loot = deposit.GetLoot(user)
+	} else if chest, ok := target.(*Chest); ok {
+		if !chest.IsUnlocked {
+			return game.SnipCannotUseItemOn(user, target, p), false, false
+		}
+		loot = chest.GetLoot(user)
+	} else {
+		return game.SnipCannotUseItemOn(user, target, p), false, false
+	}
 
 	if player, ok := user.(*Player); ok {
 		player.CollectLoot(loot)
@@ -49,10 +55,10 @@ func (p *Pickaxe) Use(user, target game.Entity) (string, bool, bool) {
 	}
 
 	return fmt.Sprintf(
-		"%v uses %v to mine %v and obtains %v.\n",
+		"%v uses %v on %v and obtains %v.\n",
 		user.GetName(),
 		p.GetName(),
-		deposit.GetName(),
+		target.GetName(),
 		game.ListItems(loot),
 		), true, false
 }

@@ -26,6 +26,6 @@ func (r *Resource) GetDesc() string {
 		)
 }
 
-func (r *Resource) Use(user, target game.Entity) (string, bool, bool) {
+func (r *Resource) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
 	return game.SnipCannotUseItemOn(user, target, r), false, false
 }

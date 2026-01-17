@@ -24,3 +24,11 @@ func FormatHealth(health int, extended bool) string {
 	}
 	return ColHealth(response)
 }
+
+func FormatDamage(damage int, extended bool) string {
+	response := fmt.Sprintf("%d", damage)
+	if extended {
+		response += " damage"
+	}
+	return ColDamage(response)
+}

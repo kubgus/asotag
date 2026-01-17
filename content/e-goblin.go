@@ -24,8 +24,8 @@ const (
 
 var (
 	lootTableGoblin = map[game.Item]int{
-		NewKey(): 50,
-		NewHealingPotion("Suspicious", 15): 50,
+		NewKey(): 30,
+		NewHealingPotion("Suspicious", 15): 70,
 	}
 
 	randomGoblinSurnames = []string{
@@ -61,6 +61,7 @@ var (
 	colGoblin = utils.NewColor(utils.ColorFgBold, utils.ColorFgGreen)
 )
 
+// TODO: Implement speed potion
 type Goblin struct {
 	Name string
 	Health int
@@ -131,10 +132,10 @@ func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 		if entityHealth, hasHealth := entity.(game.EntityHealth); hasHealth && entityHealth.GetHealth() > 0 {
 			response, _ := entityHealth.AddHealth(-g.Damage)
 			return fmt.Sprintf(
-				"%v attacks %v for %d damage! %v\n",
+				"%v attacks %v for %v damage! %v\n",
 				g.GetName(),
 				entity.GetName(),
-				g.Damage,
+				game.FormatDamage(g.Damage, false),
 				response,
 				), true
 		}

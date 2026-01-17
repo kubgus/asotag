@@ -18,3 +18,10 @@ func SnipItemCannotBeUsedBy(user Entity, item Item) string {
 		item.GetName(),
 		)
 }
+
+func SnipInvalidDirection(input string) string {
+	return fmt.Sprintf(
+		"Invalid direction. (%v)\n",
+		ColTooltip(input),
+		)
+}
