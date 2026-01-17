@@ -27,7 +27,11 @@ type Player struct {
 
 	Inventory []game.Item
 
+	// Trackers
 	looksThisTurn int
+
+	// Potion effects
+	extraMoves int
 }
 
 func NewPlayer(name string) *Player {
@@ -100,7 +104,16 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 		listActions(actions),
 		)
 
-	input := game.Input("\nChoose your action:")
+	if p.extraMoves > 0 {
+		fmt.Printf(
+			"%v %v\n",
+			game.ColTooltip("Extra Moves:"),
+			game.ColSystem(strconv.Itoa(p.extraMoves)),
+		)
+	}
+
+	fmt.Println("\nChoose your action:")
+	input := game.Input()
 
 	if input == cheatCommand {
 		return p.ApplyCheats(context), false
@@ -115,6 +128,10 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 	}
 
 	return action(p, context)
+}
+
+func (p *Player) ApplySpeedPotion(magnitude int) {
+	p.extraMoves += magnitude
 }
 
 func (p *Player) CollectLoot(loot []game.Item) (string, bool) {
@@ -182,11 +199,8 @@ var actions = map[string]actionFunc{
 					return item.GetDesc()
 				},
 				))
+			input := game.Input()
 
-			var input string
-			fmt.Print(game.ColTooltip("> "))
-			fmt.Scan(&input)
-			fmt.Println()
 			index, err := strconv.Atoi(input)
 
 			if err == nil && slices.Contains(bundleIdxs, index) {
@@ -280,7 +294,7 @@ var actions = map[string]actionFunc{
 	},
 	"inventory": func(player *Player, context *game.Context) (string, bool) {
 		if len(player.Inventory) == 0 {
-			return game.ColTooltip("Your inventory is empty.\n"), false
+			return game.ColTooltip("No inventory items.\n"), false
 		}
 		return fmt.Sprintf("%s\n", game.ListOrderedItems(player.Inventory)), false
 	},
@@ -297,11 +311,8 @@ var actions = map[string]actionFunc{
 
 		fmt.Println(game.ColTooltip("Select an item to use:"))
 		fmt.Println(game.ListOrderedItems(player.Inventory))
+		input := game.Input()
 
-		var input string
-		fmt.Print(game.ColTooltip("> "))
-		fmt.Scan(&input)
-		fmt.Println()
 		index, err := strconv.Atoi(input)
 		if err != nil || index < 0 || index >= len(player.Inventory) {
 			return fmt.Sprintf(
@@ -352,11 +363,8 @@ var actions = map[string]actionFunc{
 
 		fmt.Println(game.ColTooltip("Select what you want to examine:"))
 		fmt.Println(game.ListOrderedEntities(neighbors))
+		input := game.Input()
 
-		var input string
-		fmt.Print(game.ColTooltip("> "))
-		fmt.Scan(&input)
-		fmt.Println()
 		index, err := strconv.Atoi(input)
 		if err != nil || index < 0 || index >= len(neighbors) {
 			return fmt.Sprintf(
@@ -374,10 +382,7 @@ var actions = map[string]actionFunc{
 			"%v %v\n",
 			game.ColTooltip("Choose a direction to move:"),
 			game.ListDirections())
-		var input string
-		fmt.Print(game.ColTooltip("> "))
-		fmt.Scan(&input)
-		fmt.Println()
+		input := game.Input()
 
 		dx, dy, valid := game.DirToDelta(input)
 		if !valid {
@@ -387,7 +392,12 @@ var actions = map[string]actionFunc{
 				), false
 		}
 
-		return context.World.MoveInDirection(player, dx, dy)
+		response, ok := context.World.MoveInDirection(player, dx, dy)
+		hasExtraMove := player.extraMoves > 0
+		if ok && hasExtraMove {
+			player.extraMoves--
+		}
+		return response, ok && !hasExtraMove
 	},
 	"look": func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {
@@ -401,10 +411,7 @@ var actions = map[string]actionFunc{
 			"%v %v\n",
 			game.ColTooltip("Choose a direction to look:"),
 			game.ListDirections())
-		var input string
-		fmt.Print(game.ColTooltip("> "))
-		fmt.Scan(&input)
-		fmt.Println()
+		input := game.Input()
 
 		dx, dy, valid := game.DirToDelta(input)
 		if !valid {

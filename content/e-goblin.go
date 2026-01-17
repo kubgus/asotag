@@ -24,8 +24,8 @@ const (
 
 var (
 	lootTableGoblin = map[game.Item]int{
-		NewKey(): 10,
-		NewHealingPotion("Suspicious", 15): 20,
+		NewKey(): 50,
+		NewHealingPotion("Suspicious", 15): 50,
 	}
 
 	randomGoblinSurnames = []string{
@@ -116,7 +116,7 @@ func (g *Goblin) AddHealth(amount int) (string, bool) {
 }
 
 func (g *Goblin) GetLoot(user game.Entity) []game.Item {
-	return game.GetRandomLoot(lootTableGoblin, 1)
+	return game.GetRandomLoot(lootTableGoblin, utils.RandIntInRange(0, 1))
 }
 
 func (g *Goblin) BeforeTurn(context *game.Context) { }

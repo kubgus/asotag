@@ -2,19 +2,18 @@ package content
 
 import (
 	"fmt"
-	"strconv"
 	"text-adventure-game/game"
 )
 
 type HealingPotion struct {
 	Prefix string
-	HealAmount int
+	Magnitude int
 }
 
-func NewHealingPotion(prefix string, healAmount int) *HealingPotion {
+func NewHealingPotion(prefix string, magnitude int) *HealingPotion {
 	return &HealingPotion{
 		Prefix: prefix,
-		HealAmount: healAmount,
+		Magnitude: magnitude,
 	}
 }
 
@@ -25,7 +24,7 @@ func (k *HealingPotion) GetName() string {
 func (k *HealingPotion) GetDesc() string {
 	return fmt.Sprintf(
 		"Restores %v when used.",
-		game.FormatHealth(k.HealAmount, true),
+		game.FormatHealth(k.Magnitude, true),
 	)
 }
 
@@ -35,7 +34,7 @@ func (k *HealingPotion) Use(user, target game.Entity) (string, bool, bool) {
 		return game.SnipCannotUseItemOn(user, target, k), false, false
 	}
 
-	healAmount := k.HealAmount
+	healAmount := k.Magnitude
 
 	response, alive := targetHealth.AddHealth(healAmount)
 
@@ -44,7 +43,7 @@ func (k *HealingPotion) Use(user, target game.Entity) (string, bool, bool) {
 		user.GetName(),
 		k.GetName(),
 		target.GetName(),
-		game.ColHealth(strconv.Itoa(healAmount) + " health"),
+		game.FormatHealth(healAmount, true),
 		response,
 	), alive, true
 }

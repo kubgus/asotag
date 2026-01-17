@@ -2,15 +2,18 @@ package content
 
 import (
 	"fmt"
-	"math/rand/v2"
 	"text-adventure-game/game"
+	"text-adventure-game/utils"
 )
 
 var (
-	lootItemsChest = []game.Item{
-		NewHealingPotion("Minor", 20),
-		NewHealingPotion("Major", 50),
-		NewSword("Iron", 12, 20),
+	lootTableChest = map[game.Item]int{
+		NewHealingPotion("Minor", 20): 50,
+		NewHealingPotion("Major", 50): 20,
+		NewSpeedPotion("Minor", 1): 30,
+		NewSpeedPotion("Major", 2): 10,
+		NewSword("Iron", 12, 20): 10,
+		NewKey(): 40,
 	}
 )
 
@@ -21,10 +24,8 @@ type Chest struct {
 
 func NewChest() *Chest {
 	return &Chest{
-		IsUnlocked: false,
-		Contents: []game.Item{
-			lootItemsChest[rand.IntN(len(lootItemsChest))],
-		},
+		IsUnlocked: utils.RandChoice([]bool{true, false}),
+		Contents: game.GetRandomLoot(lootTableChest, utils.RandIntInRange(1, 4)),
 	}
 }
 
@@ -38,10 +39,12 @@ func (c *Chest) GetHealth() int {
 
 func (c *Chest) GetStatus() string {
 	if c.IsUnlocked {
+		if len(c.Contents) == 0 {
+			return game.ColHealth("Empty")
+		}
 		return game.ColHealth("Unlocked")
-	} else {
-		return game.ColHealth("Locked")
 	}
+	return game.ColHealth("Locked")
 }
 
 func (c *Chest) AddHealth(amount int) (string, bool) {

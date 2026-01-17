@@ -9,8 +9,7 @@ type EntityActive interface {
 	OnTurn(context *Context) (string, bool)
 }
 
-func Input(prompt string) string {
-	fmt.Println(prompt)
+func Input() string {
 	var input string
 	fmt.Print(ColTooltip("> "))
 	fmt.Scan(&input)
