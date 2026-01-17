@@ -155,21 +155,21 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 	if px, py, ok := context.World.GetEntityPos(p); ok {
 		context.World.Add(NewWorkbench(), px, py, false)
 
-		context.World.Add(NewDeposit("Tree", MaterialWood, 50), px, py, false)
-		context.World.Add(NewDeposit("Rock", MaterialStone, 50), px, py, false)
-		context.World.Add(NewDeposit("Iron Vein", MaterialIron, 50), px, py, false)
-		context.World.Add(NewDeposit("Gold Vein", MaterialGold, 50), px, py, false)
+		context.World.Add(NewDepositTree(50, 100), px, py, false)
+		context.World.Add(NewDepositRock(50, 100), px, py, false)
+		context.World.Add(NewDepositIronVein(50, 100), px, py, false)
+		context.World.Add(NewDepositGoldVein(50, 100), px, py, false)
 	}
 	originalInventoryLen := len(p.Inventory)
 	p.Inventory = append(
 		p.Inventory,
-		NewSword("Cheat Sword", 100, 110),
+		NewSwordGold(),
 		NewPickaxe(MaterialGold),
-		NewHealingPotion("Cheat", 100),
-		NewHealingPotion("Cheat", 100),
-		NewHealingPotion("Cheat", 100),
-		NewHealingPotion("Cheat", 100),
-		NewHealingPotion("Cheat", 100),
+		NewHealingPotionSuperior(),
+		NewHealingPotionSuperior(),
+		NewHealingPotionSuperior(),
+		NewHealingPotionSuperior(),
+		NewHealingPotionSuperior(),
 		)
 	return fmt.Sprintf(
 		"%v activated a cheat code!\n" +

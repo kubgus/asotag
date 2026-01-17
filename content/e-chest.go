@@ -8,12 +8,12 @@ import (
 
 var (
 	lootTableChest = map[game.Item]int{
-		NewHealingPotion("Minor", 20): 50,
-		NewHealingPotion("Major", 50): 20,
-		NewSpeedPotion("Minor", 1): 30,
-		NewSpeedPotion("Major", 3): 10,
-		NewSword("Iron Sword", 12, 20): 10,
-		NewSpear("Iron Spear", 11, 18): 10,
+		NewHealingPotionMinor(): 50,
+		NewHealingPotionMajor(): 20,
+		NewSpeedPotionMinor(): 30,
+		NewSpeedPotionMajor(): 10,
+		NewSwordIron(): 10,
+		NewSpearIron(): 10,
 		NewKey(): 40,
 	}
 )

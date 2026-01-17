@@ -8,36 +8,36 @@ import (
 
 var (
 	defaultWorkbenchRecipes = map[game.Item][]game.Item{
-		NewSword("Wooden Sword", 5, 10): {
+		NewSwordWooden(): {
 			NewResource(MaterialWood),
 			NewResource(MaterialWood),
 			NewResource(MaterialWood),
 			NewResource(MaterialWood),
 		},
-		NewSword("Stone Sword", 9, 16): {
+		NewSwordStone(): {
 			NewResource(MaterialStone),
 			NewResource(MaterialStone),
 			NewResource(MaterialStone),
 			NewResource(MaterialWood),
 		},
-		NewSword("Iron Sword", 12, 20): {
+		NewSwordIron(): {
 			NewResource(MaterialIron),
 			NewResource(MaterialIron),
 			NewResource(MaterialIron),
 			NewResource(MaterialWood),
 		},
-		NewSword("Gold Sword", 17, 35): {
+		NewSwordGold(): {
 			NewResource(MaterialGold),
 			NewResource(MaterialGold),
 			NewResource(MaterialGold),
 			NewResource(MaterialWood),
 		},
 
-		NewSpear("Wooden Spear", 4, 8): {
+		NewSpearWooden(): {
 			NewResource(MaterialWood),
 			NewResource(MaterialWood),
 		},
-		NewSpear("Iron Spear", 11, 18): {
+		NewSpearIron(): {
 			NewResource(MaterialIron),
 			NewResource(MaterialWood),
 		},
@@ -117,7 +117,11 @@ func (w *Workbench) GetDesc(user game.Entity) string {
 func (w *Workbench) Craft(user game.Entity, items []game.Item) game.Item {
 	for item, recipe := range w.Recipes {
 		if game.ItemsMatchUnordered(items, recipe) {
-			return item
+			itemClone, ok := utils.CloneInterface(item)
+			if !ok {
+				panic("failed to clone workbench item")
+			}
+			return itemClone
 		}
 	}
 

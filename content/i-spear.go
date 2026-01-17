@@ -20,6 +20,14 @@ func NewSpear(name string, minDamage, maxDamage int) *Spear {
 	}
 }
 
+func NewSpearWooden() *Spear {
+	return NewSpear("Wooden Spear", 4, 8)
+}
+
+func NewSpearIron() *Spear {
+	return NewSpear("Iron Spear", 11, 18)
+}
+
 func (s *Spear) GetName() string {
 	return game.ColItem(s.Name)
 }

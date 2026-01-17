@@ -3,6 +3,7 @@ package content
 import (
 	"fmt"
 	"text-adventure-game/game"
+	"text-adventure-game/utils"
 )
 
 type Deposit struct {
@@ -17,6 +18,22 @@ func NewDeposit(name string, depositType Material, amount int) *Deposit {
 		Type: depositType,
 		Amount: amount,
 	}
+}
+
+func NewDepositTree(min, max int) *Deposit {
+	return NewDeposit("Tree", MaterialWood, utils.RandIntInRange(min, max))
+}
+
+func NewDepositRock(min, max int) *Deposit {
+	return NewDeposit("Rock", MaterialStone, utils.RandIntInRange(min, max))
+}
+
+func NewDepositIronVein(min, max int) *Deposit {
+	return NewDeposit("Iron Vein", MaterialIron, utils.RandIntInRange(min, max))
+}
+
+func NewDepositGoldVein(min, max int) *Deposit {
+	return NewDeposit("Gold Vein", MaterialGold, utils.RandIntInRange(min, max))
 }
 
 func (d *Deposit) GetName() string {

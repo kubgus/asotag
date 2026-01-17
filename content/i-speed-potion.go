@@ -18,6 +18,14 @@ func NewSpeedPotion(prefix string, magnitude int) *SpeedPotion {
 	}
 }
 
+func NewSpeedPotionMinor() *SpeedPotion {
+	return NewSpeedPotion("Minor", 1)
+}
+
+func NewSpeedPotionMajor() *SpeedPotion {
+	return NewSpeedPotion("Major", 2)
+}
+
 func (p *SpeedPotion) GetName() string {
 	return game.ColItem(fmt.Sprintf("%v Speed Potion", p.Prefix))
 }

@@ -22,8 +22,8 @@ const (
 	locationCountDepositIron = 5
 	locationCountDepositGold = 3
 
-	depositCountPerResourceMin = 3
-	depositCountPerResourceMax = 6
+	depositResCountMin = 3
+	depositResCountMax = 6
 )
 
 func main() {
@@ -81,8 +81,7 @@ func main() {
 	}
 	time.Sleep(3 * time.Second)
 	fmt.Print(game.ColSystem("Thank you for playing! Feel free to try again.\n"))
-	time.Sleep(2 * time.Second)
-	fmt.Scanln()
+	time.Sleep(4 * time.Second)
 }
 
 func addPlayer(context *game.Context) *content.Player {
@@ -109,10 +108,10 @@ func addPlayer(context *game.Context) *content.Player {
 		)
 
 	player.Inventory = []game.Item{
-		content.NewSword("Really Good Stick", 1, 10),
+		content.NewSwordWooden(),
 		content.NewPickaxe(content.MaterialWood),
-		content.NewSpear("Wooden Spear", 4, 8),
-		content.NewHealingPotion("Minor", 20),
+		content.NewSpearWooden(),
+		content.NewHealingPotionMinor(),
 	}
 
 	return player
@@ -161,11 +160,7 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositWood {
-		woodDeposit := content.NewDeposit(
-			"Tree",
-			content.MaterialWood,
-			randomDepositAmount(),
-			)
+		woodDeposit := content.NewDepositTree(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			woodDeposit,
 			rand.IntN(worldSize),
@@ -176,11 +171,8 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositStone {
-		stoneDeposit := content.NewDeposit(
-			"Rock",
-			content.MaterialStone,
-			randomDepositAmount(),
-			)
+		stoneDeposit :=
+		content.NewDepositRock(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			stoneDeposit,
 			rand.IntN(worldSize),
@@ -191,11 +183,8 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositIron {
-		ironDeposit := content.NewDeposit(
-			"Iron Vein",
-			content.MaterialIron,
-			randomDepositAmount(),
-			)
+		ironDeposit :=
+		content.NewDepositIronVein(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			ironDeposit,
 			rand.IntN(worldSize),
@@ -206,11 +195,8 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositGold {
-		goldDeposit := content.NewDeposit(
-			"Gold Vein",
-			content.MaterialGold,
-			randomDepositAmount(),
-			)
+		goldDeposit :=
+		content.NewDepositGoldVein(depositResCountMin, depositResCountMax)
 		context.World.Add(
 			goldDeposit,
 			rand.IntN(worldSize),
@@ -221,8 +207,4 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	return locations
-}
-
-func randomDepositAmount() int {
-	return rand.IntN(depositCountPerResourceMax - depositCountPerResourceMin + 1) + depositCountPerResourceMin
 }
