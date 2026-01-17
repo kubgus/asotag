@@ -16,6 +16,9 @@ const (
 
 	maxLooksPerTurnPlayer = 2
 	lookActionDiscoveryChancePlayer = 0.8
+
+	cheatCommand = "UUDDLRLRBA"
+	cheatHealthBoost = 200
 )
 
 type Player struct {
@@ -118,6 +121,36 @@ func (p *Player) Move(context *game.Context) (string, bool) {
 	fmt.Scan(&input)
 	fmt.Println()
 
+	if input == cheatCommand {
+		context.CheatRevealMap = true
+		if px, py, ok := context.World.GetEntityPos(p); ok {
+			context.World.Add(NewWorkbench(), px, py, false)
+
+			context.World.Add(NewDeposit("Tree", MaterialWood, 50), px, py, false)
+			context.World.Add(NewDeposit("Rock", MaterialStone, 50), px, py, false)
+			context.World.Add(NewDeposit("Iron Vein", MaterialIron, 50), px, py, false)
+			context.World.Add(NewDeposit("Gold Vein", MaterialGold, 50), px, py, false)
+		}
+		originalInventoryLen := len(p.Inventory)
+		p.Inventory = append(
+			p.Inventory,
+			NewSword("Cheat Sword", 100, 110),
+			NewPickaxe(MaterialGold),
+			NewHealingPotion("Cheat", 100),
+			NewHealingPotion("Cheat", 100),
+			NewHealingPotion("Cheat", 100),
+			NewHealingPotion("Cheat", 100),
+			NewHealingPotion("Cheat", 100),
+		)
+		return fmt.Sprintf(
+			"%v activated a cheat code!\n" +
+			"Map revealed!\n" +
+			"A workbench appears nearby!\n" +
+			"Gained %v!\n",
+			p.GetName(),
+			game.ListItems(p.Inventory[originalInventoryLen:]),
+			), false
+	}
 	action, exists := actions[input]
 	if !exists {
 		return fmt.Sprintf(

@@ -8,6 +8,8 @@ import (
 
 type Context struct {
 	World world
+
+	CheatRevealMap bool
 }
 
 func (c *Context) ExecuteRound() {
@@ -42,6 +44,8 @@ func (c *Context) ExecuteRound() {
 			}
 		}
 
-		//c.World.debugPrint(entity)
+		if c.CheatRevealMap {
+			c.World.debugPrint(entity)
+		}
 	}
 }
