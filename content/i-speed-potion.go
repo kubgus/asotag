@@ -7,10 +7,6 @@ import (
 
 type SpeedPotion struct{}
 
-func NewSpeedPotion() *SpeedPotion {
-	return &SpeedPotion{}
-}
-
 func (p *SpeedPotion) GetName() string {
 	return game.ColItem("Speed Potion")
 }
@@ -20,7 +16,7 @@ func (p *SpeedPotion) GetDesc() string {
 }
 
 func (p *SpeedPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
-	targetSpeedPotionable, ok := target.(EntitySpeedPotionable)
+	targetSpeedPotionable, ok := target.(EntitySpeedPotion)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, p), false, false
 	}

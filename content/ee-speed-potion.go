@@ -1,5 +1,5 @@
 package content
 
-type EntitySpeedPotionable interface {
+type EntitySpeedPotion interface {
 	ApplySpeedPotion()
 }

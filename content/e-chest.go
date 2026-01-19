@@ -2,7 +2,6 @@ package content
 
 import (
 	"asotag/game"
-	"asotag/utils"
 	"fmt"
 )
 
@@ -20,15 +19,6 @@ var (
 type Chest struct {
 	IsUnlocked bool
 	Contents   []game.Item
-}
-
-func NewChest() *Chest {
-	isUnlocked, _ := utils.RandChoice([]bool{true, false})
-
-	return &Chest{
-		IsUnlocked: isUnlocked,
-		Contents:   game.GetRandomLoot(lootTableChest, utils.RandIntInRange(1, 4)),
-	}
 }
 
 func (c *Chest) GetName() string {

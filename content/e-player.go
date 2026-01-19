@@ -11,9 +11,6 @@ import (
 )
 
 const (
-	defaultPlayerName   = "Hero"
-	defaultPlayerHealth = 100
-
 	maxLooksPerTurnPlayer           = 2
 	lookActionDiscoveryChancePlayer = 0.8
 
@@ -32,20 +29,6 @@ type Player struct {
 
 	// Potion effects
 	speedPotion bool
-}
-
-func NewPlayer(name string) *Player {
-	nameToUse := name
-	if nameToUse == "" {
-		nameToUse = defaultPlayerName
-	}
-
-	return &Player{
-		Name:   nameToUse,
-		Health: defaultPlayerHealth,
-
-		Inventory: []game.Item{},
-	}
 }
 
 func (p *Player) GetName() string {

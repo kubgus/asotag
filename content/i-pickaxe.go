@@ -5,19 +5,8 @@ import (
 	"fmt"
 )
 
-const (
-	defaultPickaxeMinDamage = 5
-	defaultPickaxeMaxDamage = 10
-)
-
 type Pickaxe struct {
 	Material Material
-}
-
-func NewPickaxe(material Material) *Pickaxe {
-	return &Pickaxe{
-		Material: material,
-	}
 }
 
 func (p *Pickaxe) GetName() string {

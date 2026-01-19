@@ -9,17 +9,11 @@ import (
 )
 
 const (
-	defaultGoblinName   = "Goblin"
-	defaultGoblinHealth = 30
-	defaultGoblinDamage = 5
-
-	surnameChanceGoblin = 1
-
-	dropChanceGoblin = 0.25
-
 	moveChanceGoblinChase  = 0.6
 	moveChanceGoblinRandom = 0.2
 	moveChanceGoblinIdle   = 0.2
+
+	dropChanceGoblin = 0.25
 )
 
 var (
@@ -27,39 +21,12 @@ var (
 		NewKey():                           30,
 		NewHealingPotion("Suspicious", 15): 70,
 	}
-
-	takenGoblinSurnames  = map[string]bool{}
-	randomGoblinSurnames = []string{
-		"Archibald",
-		"Blot",
-		"Cook",
-		"Drake",
-		"Elph",
-		"Fenrir",
-		"Grok",
-		"Hugo",
-		"Jinx",
-		"Kip",
-		"Lug",
-		"Muck",
-		"Nibble",
-		"Oscar",
-		"Pax",
-		"Quill",
-		"Rattle",
-		"Shank",
-		"Till",
-		"Urk",
-		"Vorp",
-		"Zig",
-	}
 )
 
 var (
 	colGoblin = utils.NewColor(utils.ColorFgBold, utils.ColorFgGreen)
 )
 
-// TODO: Implement speed potion
 type Goblin struct {
 	Name   string
 	Health int
@@ -67,27 +34,6 @@ type Goblin struct {
 
 	// Potion effects
 	speedPotion bool
-}
-
-func NewGoblin() *Goblin {
-	surname := ""
-	if rand.Float32() < surnameChanceGoblin {
-		var randomSurname string
-		for {
-			randomSurname, _ = utils.RandChoice(randomGoblinSurnames)
-			if !takenGoblinSurnames[randomSurname] && len(takenGoblinSurnames) < len(randomGoblinSurnames) {
-				takenGoblinSurnames[randomSurname] = true
-				break
-			}
-		}
-		surname = fmt.Sprintf(" %v", randomSurname)
-	}
-
-	return &Goblin{
-		Name:   defaultGoblinName + surname,
-		Health: defaultGoblinHealth,
-		Damage: defaultGoblinDamage,
-	}
 }
 
 func (g *Goblin) GetName() string {

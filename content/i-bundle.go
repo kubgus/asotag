@@ -9,12 +9,6 @@ type Bundle struct {
 	Items []game.Item
 }
 
-func NewBundle(items []game.Item) *Bundle {
-	return &Bundle{
-		Items: items,
-	}
-}
-
 func (b *Bundle) GetName() string {
 	return game.ColItem("Bundle")
 }

@@ -9,12 +9,6 @@ type Resource struct {
 	Type Material
 }
 
-func NewResource(resourceType Material) *Resource {
-	return &Resource{
-		Type: resourceType,
-	}
-}
-
 func (r *Resource) GetName() string {
 	return game.ColItem(r.Type.String())
 }
