@@ -316,11 +316,11 @@ var actions = map[string]actionFunc{
 		item := player.Inventory[index]
 
 		var result string
-		var ok, consume bool
+		var endTurn, consume bool
 
 		if itemUseEntity, ok := item.(game.ItemUseEntity); ok {
 			fmt.Printf(
-				game.ColTooltip("Select a target:\n%v"),
+				game.ColTooltip("Select a target:\n%v\n"),
 				game.ListOrderedEntities(neighbors),
 				)
 
@@ -334,7 +334,7 @@ var actions = map[string]actionFunc{
 			}
 			target := neighbors[targetIndex]
 
-			result, ok, consume = itemUseEntity.UseOnEntity(
+			result, endTurn, consume = itemUseEntity.UseOnEntity(
 				player, target, context,
 				)
 		} else if itemUseDirection, ok := item.(game.ItemUseDirection); ok {
@@ -349,7 +349,7 @@ var actions = map[string]actionFunc{
 				return game.SnipInvalidDirection(directionInput), false
 			}
 
-			result, ok, consume = itemUseDirection.UseInDirection(
+			result, endTurn, consume = itemUseDirection.UseInDirection(
 				player, dx, dy, directionInput, context,
 				)
 		} else {
@@ -368,7 +368,7 @@ var actions = map[string]actionFunc{
 			)
 		}
 
-		return result, ok
+		return result, endTurn
 	},
 	"examine": func(player *Player, context *game.Context) (string, bool) {
 		neighbors := context.World.GetOccupantsSameTile(player)
