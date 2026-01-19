@@ -11,6 +11,8 @@
 
 > *A systems-oriented terminal adventure game.*
 
+[Watch playthrough](https://www.youtube.com/watch?v=D6-HlyQxbjo)
+
 ## Contents 📄
 
 - [Overview 👀](#overview-) - Information about this project
