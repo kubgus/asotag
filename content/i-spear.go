@@ -40,17 +40,12 @@ func (s *Spear) GetDesc() string {
 	)
 }
 
-func (s *Spear) Use(user, _ game.Entity, context *game.Context) (string, bool, bool) {
-	fmt.Printf(
-		game.ColTooltip("Select a direction to throw: %v\n"),
-		game.ListDirections(),
-	)
-	input := game.Input()
-	dx, dy, valid := game.DirToDelta(input)
-	if !valid {
-		return game.SnipInvalidDirection(input), false, false
-	}
-
+func (s *Spear) UseInDirection(
+	user game.Entity,
+	dx, dy int,
+	direction string,
+	context *game.Context,
+) (string, bool, bool) {
 	px, py, ok := context.World.GetEntityPos(user)
 	if !ok {
 		return game.SnipItemCannotBeUsedBy(user, s), false, false
@@ -61,19 +56,22 @@ func (s *Spear) Use(user, _ game.Entity, context *game.Context) (string, bool, b
 		py+dy,
 	)
 
-	target, ok := utils.RandChoice(targets)
-	if !ok {
+	var target game.Entity
+	var targetHealth game.EntityHealth
+	for _, entity := range utils.Shuffled(targets) {
+		if entityHealth, ok := entity.(game.EntityHealth); ok {
+			target = entity
+			targetHealth = entityHealth
+			break
+		}
+	}
+	if target == nil {
 		return fmt.Sprintf(
 			"%v throws %v %v into the distance, hitting nothing.\n",
 			user.GetName(),
 			s.GetName(),
-			game.ColAction(input),
-		), true, true
-	}
-
-	targetHealth, ok := target.(game.EntityHealth)
-	if !ok {
-		return game.SnipCannotUseItemOn(user, target, s), false, false
+			game.ColAction(direction),
+			), true, true
 	}
 
 	damage := utils.RandIntInRange(s.MinDamage, s.MaxDamage)
@@ -97,7 +95,7 @@ func (s *Spear) Use(user, _ game.Entity, context *game.Context) (string, bool, b
 		"%v throws %v %v at %v, dealing %v damage! %v\n",
 		user.GetName(),
 		s.GetName(),
-		game.ColAction(input),
+		game.ColAction(direction),
 		target.GetName(),
 		game.FormatDamage(damage, false),
 		response,

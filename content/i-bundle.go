@@ -26,7 +26,7 @@ func (b *Bundle) GetDesc() string {
 	)
 }
 
-func (b *Bundle) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (b *Bundle) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
 	craftingAllowed := false
 	var craftedItem game.Item
 

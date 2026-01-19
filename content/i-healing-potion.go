@@ -40,7 +40,7 @@ func (k *HealingPotion) GetDesc() string {
 	)
 }
 
-func (k *HealingPotion) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (k *HealingPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
 	targetHealth, ok := target.(game.EntityHealth)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, k), false, false

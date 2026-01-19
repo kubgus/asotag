@@ -25,7 +25,3 @@ func (r *Resource) GetDesc() string {
 		game.ColItem(r.Type.String()),
 	)
 }
-
-func (r *Resource) Use(user, target game.Entity, _ *game.Context) (string, bool, bool) {
-	return game.SnipCannotUseItemOn(user, target, r), false, false
-}

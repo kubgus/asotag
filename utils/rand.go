@@ -20,3 +20,13 @@ func RandChoice[T any](choices []T) (T, bool) {
 	}
 	return choices[rand.IntN(len(choices))], true
 }
+
+func Shuffled[T any](slice []T) []T {
+	shuffled := make([]T, len(slice))
+	copy(shuffled, slice)
+	rand.Shuffle(len(shuffled), func(i, j int) {
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	})
+
+	return shuffled
+}

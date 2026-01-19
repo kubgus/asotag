@@ -315,23 +315,46 @@ var actions = map[string]actionFunc{
 		}
 		item := player.Inventory[index]
 
-		fmt.Println(game.ColTooltip("Select a target:"))
-		fmt.Println(game.ListOrderedEntities(neighbors))
+		var result string
+		var ok, consume bool
 
-		var targetInput string
-		fmt.Print(game.ColTooltip("> "))
-		fmt.Scan(&targetInput)
-		fmt.Println()
-		targetIndex, err := strconv.Atoi(targetInput)
-		if err != nil || targetIndex < 0 || targetIndex >= len(neighbors) {
-			return fmt.Sprintf(
-				"Invalid target selection. (%v)\n",
-				game.ColTooltip(targetInput),
-			), false
+		if itemUseEntity, ok := item.(game.ItemUseEntity); ok {
+			fmt.Printf(
+				game.ColTooltip("Select a target:\n%v"),
+				game.ListOrderedEntities(neighbors),
+				)
+
+			var targetInput = game.Input()
+			targetIndex, err := strconv.Atoi(targetInput)
+			if err != nil || targetIndex < 0 || targetIndex >= len(neighbors) {
+				return fmt.Sprintf(
+					"Invalid target selection. (%v)\n",
+					game.ColTooltip(targetInput),
+					), false
+			}
+			target := neighbors[targetIndex]
+
+			result, ok, consume = itemUseEntity.UseOnEntity(
+				player, target, context,
+				)
+		} else if itemUseDirection, ok := item.(game.ItemUseDirection); ok {
+			fmt.Printf(
+				game.ColTooltip("Choose a direction to use: %v\n"),
+				game.ListDirections(),
+			)
+
+			var directionInput = game.Input()
+			var dx, dy, ok = game.DirToDelta(directionInput)
+			if !ok {
+				return game.SnipInvalidDirection(directionInput), false
+			}
+
+			result, ok, consume = itemUseDirection.UseInDirection(
+				player, dx, dy, directionInput, context,
+				)
+		} else {
+			return game.SnipItemCannotBeUsedBy(player, item), false
 		}
-		target := neighbors[targetIndex]
-
-		result, ok, consume := item.Use(player, target, context)
 
 		if consume {
 			result += fmt.Sprintf(
