@@ -33,5 +33,5 @@ func (p *SpeedPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (st
 		p.GetName(),
 		target.GetName(),
 		target.GetName(),
-	), true, true
+	), false, true
 }

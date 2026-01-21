@@ -50,5 +50,5 @@ func (k *HealingPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (
 	healAmount := k.Magnitude
 
 	response := targetHealth.GetHealth().Change(healAmount)
-	return response, true, true
+	return response, false, true
 }
