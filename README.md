@@ -77,14 +77,25 @@ a new game mechanic that is able to interact with the entire ecosystem.
 
 *(Titles marked with italic have not been implemented yet)*
 
----
-
 ### Terminal user interface (TUI)
 
 The TUI usually consists of scrollable text that describe what is happening
 **from the perspective of the world**. This can be extended with some
 graphical (ASCII art) elements
 (like the map that is available with cheat codes).
+
+The unique thing about this design choice is that the players have to find
+creative ways to map the world temselves. This creates a very fun, cool, and
+potentially nostalgic gameplay mechanic that adds a personalized touch to each
+player experience. It also creates an opportunity for skilled players to
+be able to write things down more efficiently or even memorize the map.
+
+> **Pro Tip**: Since the game world is a grid, you can use a spreadsheet
+program like MS Excel, Google Sheets or Apple Numbers and use acronyms
+to quickly write down important locations or track enemies.
+(although a paper and pen will work just as well)
+
+---
 
 ### Language choice
 
@@ -197,6 +208,16 @@ bundle in your inventory to unbundle it and get your items back.
 - *Note 2:* You can exit the interface by selecting another bundle instead
 of typing `x` to add items to that bundle. Bundles cannot be bundled.
 (non-stackable)
+
+**Opening Chests:**
+- Since all entities require an item to be used on them for interaction, it
+might not always be obvious which item should be used. This is especially
+true with **Chests**.
+- When you don't know which item to use on something, it is good to remember
+this very easy rule:
+    - <ins>***When in doubt, use a Pickaxe!***</ins>
+- So yes, after you unlock the **Chest** with a **Key**, use the **Pickaxe**
+on it to get the loot.
 
 ### We want your feedback!
 
