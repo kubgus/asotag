@@ -59,15 +59,8 @@ func (im *InventoryModule) RemoveItems(indexes []int) string {
 		)
 	}
 
-	for _, index := range indexes {
-		if !im.HasIndex(index) {
-			return game.SnipInvalidItemIndex(index)
-		}
-		items = append(items, im.Items[index])
-	}
-
 	return fmt.Sprintf(
-		"%s removes %s from their inventory.\n",
+		"%s drops %s.\n",
 		im.entity.GetName(),
 		game.ListItems(items),
 	)
@@ -91,11 +84,7 @@ func (im *InventoryModule) UseItemOnEntity(index int, target game.Entity) (strin
 			removeResponse = im.RemoveItems([]int{index})
 		}
 
-		return fmt.Sprintf(
-			"%s%s",
-			response,
-			removeResponse,
-		), ok
+		return response + removeResponse, ok
 	}
 
 	return fmt.Sprintf(

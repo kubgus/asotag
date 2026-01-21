@@ -198,11 +198,7 @@ var actions = map[string]actionFunc{
 				removeResponse := player.GetInventory().RemoveItems([]int{itemIndex})
 				addResponse := player.GetInventory().AddItems(bundle.Items)
 
-				return fmt.Sprintf(
-					"Unbundling items...\n%s%s",
-					addResponse,
-					removeResponse,
-				), false
+				return addResponse + removeResponse, false
 			}
 
 			if !player.GetInventory().HasIndex(itemIndex) || indexErr != nil || isBundleSelected {
@@ -210,20 +206,28 @@ var actions = map[string]actionFunc{
 					return "Nothing to bundle.\n", false
 				}
 
-				for _, idx := range itemIndexes {
-					bundle.Items = append(
-						bundle.Items,
-						player.GetInventory().Items[idx],
+				var response string
+				if !isBundleSelected {
+					bundle = NewBundle([]game.Item{})
+					response = player.GetInventory().AddItems([]game.Item{ bundle })
+				} else {
+					response = fmt.Sprintf(
+						"%s adds items to %s.\n",
+						player.GetName(),
+						bundle.GetName(),
 					)
 				}
-				removeResponse := player.GetInventory().RemoveItems(itemIndexes)
-				addResponse := player.GetInventory().AddItems([]game.Item{bundle})
 
-				return fmt.Sprintf(
-					"Bundling items...\n%s%s",
-					addResponse,
-					removeResponse,
-				), false
+				for _, i := range itemIndexes {
+					bundle.Items = append(
+						bundle.Items,
+						player.GetInventory().Items[i],
+					)
+				}
+
+				removeResponse := player.GetInventory().RemoveItems(itemIndexes)
+
+				return response + removeResponse, false
 			}
 
 			itemIndexes = append(itemIndexes, itemIndex)

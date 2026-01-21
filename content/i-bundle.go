@@ -39,10 +39,7 @@ func (b *Bundle) UseOnEntity(user, target game.Entity, _ *game.Context) (string,
 		if player, ok := user.(*Player); ok {
 			addResponse := player.GetInventory().AddItems([]game.Item{craftedItem})
 
-			return fmt.Sprintf(
-				"Crafting successful!\n%v%v",
-				addResponse,
-			), true, true
+			return addResponse, true, true
 		} else {
 			return game.SnipItemCannotBeUsedBy(user, b), false, false
 		}
