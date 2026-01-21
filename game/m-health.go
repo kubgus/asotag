@@ -62,6 +62,8 @@ func (hm *HealthModule) Change(amount int) string {
 
 	if hm.MaxHealth > 0 && hm.CurrentHealth > hm.MaxHealth {
 		hm.CurrentHealth = hm.MaxHealth
+	} else if hm.CurrentHealth < 0 {
+		hm.CurrentHealth = 0
 	}
 
 	response.WriteString(hm.Get())
