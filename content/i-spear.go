@@ -4,6 +4,7 @@ import (
 	"asotag/game"
 	"asotag/utils"
 	"fmt"
+	"strconv"
 )
 
 type Spear struct {
@@ -35,8 +36,8 @@ func (s *Spear) GetName() string {
 func (s *Spear) GetDesc() string {
 	return fmt.Sprintf(
 		"Deals %v to %v damage when thrown at an adjacent square.",
-		game.FormatDamage(s.MinDamage, false),
-		game.FormatDamage(s.MaxDamage, false),
+		game.ColDamage(strconv.Itoa(s.MinDamage)),
+		game.ColDamage(strconv.Itoa(s.MaxDamage)),
 	)
 }
 

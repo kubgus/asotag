@@ -3,6 +3,7 @@ package content
 import (
 	"asotag/game"
 	"fmt"
+	"strconv"
 )
 
 type HealingPotion struct {
@@ -35,8 +36,8 @@ func (k *HealingPotion) GetName() string {
 
 func (k *HealingPotion) GetDesc() string {
 	return fmt.Sprintf(
-		"Restores %v when used.",
-		game.FormatHealth(k.Magnitude, true),
+		"Restores %v health when used.",
+		game.ColHealth(strconv.Itoa(k.Magnitude)),
 	)
 }
 

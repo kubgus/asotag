@@ -4,6 +4,7 @@ import (
 	"asotag/game"
 	"asotag/utils"
 	"fmt"
+	"strconv"
 )
 
 type Sword struct {
@@ -43,8 +44,8 @@ func (s *Sword) GetName() string {
 func (s *Sword) GetDesc() string {
 	return fmt.Sprintf(
 		"Deals %v to %v close-range damage.",
-		game.FormatDamage(s.MinDamage, false),
-		game.FormatDamage(s.MaxDamage, false),
+		game.ColDamage(strconv.Itoa(s.MinDamage)),
+		game.ColDamage(strconv.Itoa(s.MaxDamage)),
 	)
 }
 

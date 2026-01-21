@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand/v2"
+	"strconv"
 )
 
 const (
@@ -124,7 +125,7 @@ func (g *Goblin) GetName() string {
 }
 
 func (g *Goblin) GetStatus() string {
-	return game.FormatHealth(g.GetHealth().CurrentHealth, false)
+	return game.ColHealth(strconv.Itoa(g.GetHealth().CurrentHealth))
 }
 
 func (g *Goblin) GetDesc(user game.Entity) string {

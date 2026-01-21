@@ -68,7 +68,7 @@ func (p *Player) GetName() string {
 }
 
 func (p *Player) GetStatus() string {
-	return game.FormatHealth(p.GetHealth().CurrentHealth, false)
+	return game.ColHealth(strconv.Itoa(p.GetHealth().CurrentHealth))
 }
 
 func (p *Player) GetDesc(user game.Entity) string {
@@ -209,7 +209,7 @@ var actions = map[string]actionFunc{
 				var response string
 				if !isBundleSelected {
 					bundle = NewBundle([]game.Item{})
-					response = player.GetInventory().AddItems([]game.Item{ bundle })
+					response = player.GetInventory().AddItems([]game.Item{bundle})
 				} else {
 					response = fmt.Sprintf(
 						"%s adds items to %s.\n",

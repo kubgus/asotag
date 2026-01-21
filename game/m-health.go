@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -25,15 +26,15 @@ func (hm *HealthModule) Get() string {
 		return fmt.Sprintf(
 			"%s is now at %s/%s health.\n",
 			hm.entity.GetName(),
-			FormatHealth(hm.CurrentHealth, false),
-			FormatHealth(hm.MaxHealth, true),
+			ColHealth(strconv.Itoa(hm.CurrentHealth)),
+			ColHealth(strconv.Itoa(hm.MaxHealth)),
 		)
 	}
 
 	return fmt.Sprintf(
 		"%s is now at %s health.\n",
 		hm.entity.GetName(),
-		FormatHealth(hm.CurrentHealth, false),
+		ColHealth(strconv.Itoa(hm.CurrentHealth)),
 	)
 }
 
@@ -43,22 +44,18 @@ func (hm *HealthModule) Change(amount int) string {
 	effectiveAmount := amount
 
 	if amount > 0 {
-		response.WriteString(fmt.Sprintf(
-			"%s gains %s.\n",
+		fmt.Fprintf(&response, "%s gains %s health.\n",
 			hm.entity.GetName(),
-			FormatHealth(effectiveAmount, true),
-		))
+			ColHealth(strconv.Itoa(effectiveAmount)))
 	} else if amount < 0 {
 		//if defense, ok := hm.entity.(HasDefense); ok {
 		//	totalDefense := defense.GetDefense().EffectiveDefense()
 		//	effectiveAmount = -calculateEffectiveDamage(-amount, totalDefense)
 		//}
 
-		response.WriteString(fmt.Sprintf(
-			"%s loses %s.\n",
+		fmt.Fprintf(&response, "%s loses %s health.\n",
 			hm.entity.GetName(),
-			FormatHealth(-effectiveAmount, true),
-		))
+			ColHealth(strconv.Itoa(-effectiveAmount)))
 	}
 
 	hm.CurrentHealth += effectiveAmount
@@ -72,10 +69,8 @@ func (hm *HealthModule) Change(amount int) string {
 	if hm.CurrentHealth < 0 {
 		hm.CurrentHealth = 0
 
-		response.WriteString(fmt.Sprintf(
-			"%s has been knocked out.\n",
-			hm.entity.GetName(),
-		))
+		fmt.Fprintf(&response, "%s has been knocked out.\n",
+			hm.entity.GetName())
 	}
 
 	return response.String()
