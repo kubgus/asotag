@@ -41,24 +41,24 @@ var workbenchRecipes = map[game.Item][]game.Item{
 		NewResource(MaterialWood),
 	},
 
-	NewPickaxe(MaterialWood): {
+	NewPickaxeWooden(): {
 		NewResource(MaterialWood),
 		NewResource(MaterialWood),
 		NewResource(MaterialWood),
 	},
-	NewPickaxe(MaterialStone): {
+	NewPickaxeStone(): {
 		NewResource(MaterialStone),
 		NewResource(MaterialStone),
 		NewResource(MaterialWood),
 		NewResource(MaterialWood),
 	},
-	NewPickaxe(MaterialIron): {
+	NewPickaxeIron(): {
 		NewResource(MaterialIron),
 		NewResource(MaterialIron),
 		NewResource(MaterialWood),
 		NewResource(MaterialWood),
 	},
-	NewPickaxe(MaterialGold): {
+	NewPickaxeGolden(): {
 		NewResource(MaterialGold),
 		NewResource(MaterialGold),
 		NewResource(MaterialWood),

@@ -6,17 +6,39 @@ import (
 )
 
 type Pickaxe struct {
+	Name     string
 	Material Material
 }
 
-func NewPickaxe(material Material) *Pickaxe {
+func NewPickaxe(name string, material Material) *Pickaxe {
 	return &Pickaxe{
+		Name:     name,
 		Material: material,
 	}
 }
 
+func NewPickaxeHand() *Pickaxe {
+	return NewPickaxe("Hand", MaterialVoid)
+}
+
+func NewPickaxeWooden() *Pickaxe {
+	return NewPickaxe("Wooden Pickaxe", MaterialWood)
+}
+
+func NewPickaxeStone() *Pickaxe {
+	return NewPickaxe("Stone Pickaxe", MaterialStone)
+}
+
+func NewPickaxeIron() *Pickaxe {
+	return NewPickaxe("Iron Pickaxe", MaterialIron)
+}
+
+func NewPickaxeGolden() *Pickaxe {
+	return NewPickaxe("Golden Pickaxe", MaterialGold)
+}
+
 func (p *Pickaxe) GetName() string {
-	return game.ColItem(p.Material.AdjectiveString() + " Pickaxe")
+	return game.ColItem(p.Name)
 }
 
 func (p *Pickaxe) GetDesc() string {

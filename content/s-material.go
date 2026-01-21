@@ -4,7 +4,8 @@ type Material int
 
 // Ordered by increasing strength/durability
 const (
-	MaterialWood Material = iota
+	MaterialVoid Material = iota
+	MaterialWood
 	MaterialStone
 	MaterialIron
 	MaterialGold
@@ -12,6 +13,8 @@ const (
 
 func (m Material) String() string {
 	switch m {
+	case MaterialVoid:
+		return "Void"
 	case MaterialWood:
 		return "Wood"
 	case MaterialStone:
@@ -22,20 +25,5 @@ func (m Material) String() string {
 		return "Gold"
 	default:
 		return "Mysterious Material"
-	}
-}
-
-func (m Material) AdjectiveString() string {
-	switch m {
-	case MaterialWood:
-		return "Wooden"
-	case MaterialStone:
-		return "Stone"
-	case MaterialIron:
-		return "Iron"
-	case MaterialGold:
-		return "Golden"
-	default:
-		return "Mysterious"
 	}
 }

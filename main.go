@@ -105,8 +105,8 @@ func addPlayer(context *game.Context) *content.Player {
 	)
 
 	player.GetInventory().AddItems([]game.Item{
+		content.NewPickaxeHand(),
 		content.NewSwordWooden(),
-		content.NewPickaxe(content.MaterialWood),
 		content.NewSpearWooden(),
 		content.NewHealingPotionMinor(),
 	})

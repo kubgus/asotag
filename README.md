@@ -209,16 +209,6 @@ bundle in your inventory to unbundle it and get your items back.
 of typing `x` to add items to that bundle. Bundles cannot be bundled.
 (non-stackable)
 
-**Opening Chests:**
-- Since all entities require an item to be used on them for interaction, it
-might not always be obvious which item should be used. This is especially
-true with **Chests**.
-- When you don't know which item to use on something, it is good to remember
-this very easy rule:
-    - <ins>***When in doubt, use a Pickaxe!***</ins>
-- So yes, after you unlock the **Chest** with a **Key**, use the **Pickaxe**
-on it to get the loot.
-
 ### We want your feedback!
 
 We highly encourage you to play the game and leave your feedback

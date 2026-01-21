@@ -64,7 +64,7 @@ func (c *Chest) GetDesc(user game.Entity) string {
 	if c.IsUnlocked {
 		if c.GetLoot().LootLimit > 0 {
 			return fmt.Sprintf(
-				"%v is unlocked. Mine it to gain loot.\n",
+				"%v is unlocked and contains loot.\n",
 				c.GetName(),
 			)
 		}
@@ -74,7 +74,7 @@ func (c *Chest) GetDesc(user game.Entity) string {
 		)
 	} else {
 		return fmt.Sprintf(
-			"%v is locked. Unlock it to gain loot.\n",
+			"%v is locked.\n",
 			c.GetName(),
 		)
 	}

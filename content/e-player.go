@@ -137,7 +137,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 	}
 	response := p.GetInventory().AddItems([]game.Item{
 		NewSwordGolden(),
-		NewPickaxe(MaterialGold),
+		NewPickaxeGolden(),
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),
