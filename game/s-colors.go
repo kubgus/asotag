@@ -5,16 +5,16 @@ import (
 )
 
 var (
-	ColReset    = utils.NewColor(utils.ColorReset)
+	ColReset = utils.NewColor(utils.ColorReset)
 
-	ColHealth   = utils.NewColor(utils.ColorFgBold, utils.ColorFgRed)
-	ColDamage   = utils.NewColor(utils.ColorFgBrightRed)
+	ColHealth = utils.NewColor(utils.ColorFgBold, utils.ColorFgRed)
+	ColDamage = utils.NewColor(utils.ColorFgBrightRed)
 
 	ColItem     = utils.NewColor(utils.ColorFgBold, utils.ColorFgBlue)
 	ColLocation = utils.NewColor(utils.ColorFgBold, utils.ColorFgItalic, utils.ColorFgWhite)
 	ColHero     = utils.NewColor(utils.ColorFgBold, utils.ColorFgCyan)
 
-	ColAction   = utils.NewColor(utils.ColorFgBold, utils.ColorFgYellow)
-	ColTooltip  = utils.NewColor(utils.ColorFgDim, utils.ColorFgWhite)
-	ColSystem   = utils.NewColor(utils.ColorFgBold, utils.ColorFgPurple)
+	ColAction  = utils.NewColor(utils.ColorFgBold, utils.ColorFgYellow)
+	ColTooltip = utils.NewColor(utils.ColorFgDim, utils.ColorFgWhite)
+	ColSystem  = utils.NewColor(utils.ColorFgBold, utils.ColorFgPurple)
 )
