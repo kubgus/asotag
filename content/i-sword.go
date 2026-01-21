@@ -51,7 +51,7 @@ func (s *Sword) GetDesc() string {
 
 func (s *Sword) UseOnEntity(
 	user, target game.Entity,
-	_ *game.World,
+	_ *game.Context,
 ) (string, bool, bool) {
 	targetHealth, ok := target.(game.HasHealth)
 	if !ok {
