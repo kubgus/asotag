@@ -9,7 +9,7 @@ type Point struct {
 	X, Y int
 }
 
-type world struct {
+type World struct {
 	Positions map[Entity]Point
 	Occupants map[Point][]Entity
 
@@ -18,8 +18,8 @@ type world struct {
 	Size int
 }
 
-func NewWorld(size int) *world {
-	return &world{
+func NewWorld(size int) *World {
+	return &World{
 		Positions:   make(map[Entity]Point),
 		Occupants:   make(map[Point][]Entity),
 		EntityOrder: make([]Entity, 0),
@@ -27,7 +27,7 @@ func NewWorld(size int) *world {
 	}
 }
 
-func (w *world) Add(entity Entity, x, y int, addToOrder bool) bool {
+func (w *World) Add(entity Entity, x, y int, addToOrder bool) bool {
 	if x < 0 || x >= w.Size || y < 0 || y >= w.Size {
 		return false
 	}
@@ -43,7 +43,7 @@ func (w *world) Add(entity Entity, x, y int, addToOrder bool) bool {
 	return true
 }
 
-func (w *world) Remove(entity Entity, removeFromOrder bool) bool {
+func (w *World) Remove(entity Entity, removeFromOrder bool) bool {
 	pos, ok := w.Positions[entity]
 	if !ok {
 		return false
@@ -76,12 +76,12 @@ func (w *world) Remove(entity Entity, removeFromOrder bool) bool {
 	return true
 }
 
-func (w *world) Move(entity Entity, x, y int) {
+func (w *World) Move(entity Entity, x, y int) {
 	w.Remove(entity, false)
 	w.Add(entity, x, y, false)
 }
 
-func (w *world) MoveInDirection(entity Entity, dx, dy int) (string, bool) {
+func (w *World) MoveInDirection(entity Entity, dx, dy int) (string, bool) {
 	pos, ok := w.Positions[entity]
 	if !ok {
 		return fmt.Sprintf("%v is not in the world.\n", entity.GetName()), false
@@ -100,16 +100,16 @@ func (w *world) MoveInDirection(entity Entity, dx, dy int) (string, bool) {
 	return fmt.Sprintf("%v moves %v.\n", entity.GetName(), ColAction(direction)), true
 }
 
-func (w *world) GetEntityPos(entity Entity) (int, int, bool) {
+func (w *World) GetEntityPos(entity Entity) (int, int, bool) {
 	p, ok := w.Positions[entity]
 	return p.X, p.Y, ok
 }
 
-func (w *world) GetEntitiesAt(x, y int) []Entity {
+func (w *World) GetEntitiesAt(x, y int) []Entity {
 	return w.Occupants[Point{x, y}]
 }
 
-func (w *world) GetOccupantsSameTile(entity Entity) []Entity {
+func (w *World) GetOccupantsSameTile(entity Entity) []Entity {
 	pos, ok := w.Positions[entity]
 	if !ok {
 		return nil
@@ -118,7 +118,7 @@ func (w *world) GetOccupantsSameTile(entity Entity) []Entity {
 }
 
 // Generated using Gemini
-func (w *world) debugPrint(highlightEntity Entity) {
+func (w *World) debugPrint(highlightEntity Entity) {
 	// Header with X-axis coordinates
 	fmt.Print("   ")
 	for x := 0; x < w.Size; x++ {

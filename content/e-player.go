@@ -11,49 +11,64 @@ import (
 )
 
 const (
+	defaultNamePlayer   = "Hero"
 	maxLooksPerTurnPlayer           = 2
 	lookActionDiscoveryChancePlayer = 0.8
 
 	cheatCommand     = "UUDDLRLRBA"
-	cheatHealthBoost = 200
 )
 
 type Player struct {
 	Name   string
-	Health int
 
-	Inventory []game.Item
+	health game.HealthModule
+	inventory InventoryModule
+	movement MovementModule
 
-	// Trackers
+	// Custom trackers
 	looksThisTurn int
+}
 
-	// Potion effects
-	speedPotion bool
+func NewPlayer(name string) *Player {
+	player := Player{
+		Name:   name,
+
+		health: game.HealthModule{
+			CurrentHealth: 100,
+			MaxHealth:     0,
+		},
+		inventory: InventoryModule{},
+		movement: MovementModule{},
+	}
+
+	if player.Name == "" {
+		player.Name = defaultNamePlayer
+	}
+
+	return &player
+}
+
+func (p *Player) GetHealth() *game.HealthModule {
+	p.health.Init(p)
+	return &p.health
+}
+
+func (p *Player) GetInventory() *InventoryModule {
+	p.inventory.Init(p)
+	return &p.inventory
+}
+
+func (p *Player) GetMovement() *MovementModule {
+	p.movement.Init(p)
+	return &p.movement
 }
 
 func (p *Player) GetName() string {
 	return game.ColHero(p.Name)
 }
 
-func (p *Player) GetHealth() int {
-	return p.Health
-}
-
 func (p *Player) GetStatus() string {
-	return game.FormatHealth(p.Health, false)
-}
-
-func (p *Player) AddHealth(amount int) (string, bool) {
-	p.Health += amount
-
-	if p.Health <= 0 {
-		return fmt.Sprintf(
-			"%v has been knocked out.",
-			p.GetName(),
-		), false
-	}
-
-	return game.GetHealthStatusResponse(p), true
+	return game.FormatHealth(p.GetHealth().CurrentHealth, false)
 }
 
 func (p *Player) GetDesc(user game.Entity) string {
@@ -105,22 +120,6 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 	return action(p, context)
 }
 
-func (p *Player) ApplySpeedPotion() {
-	p.speedPotion = true
-}
-
-func (p *Player) CollectLoot(loot []game.Item) (string, bool) {
-	if len(loot) > 0 {
-		p.Inventory = append(p.Inventory, loot...)
-	}
-
-	return fmt.Sprintf(
-		"%v collects %v.\n",
-		p.GetName(),
-		game.ListItems(loot),
-	), true
-}
-
 func (p *Player) ApplyCheats(context *game.Context) string {
 	if px, py, ok := context.World.GetEntityPos(p); ok {
 		context.World.Add(NewWorkbench(), px, py, false)
@@ -136,7 +135,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 			context.World.Add(unlockedChest, px, py, false)
 		}
 	}
-	response, _ := p.CollectLoot([]game.Item{
+	response := p.GetInventory().AddItems([]game.Item{
 		NewSwordGold(),
 		NewPickaxe(MaterialGold),
 		NewHealingPotionSuperior(),
@@ -148,8 +147,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 	})
 	context.CheatRevealMap = true
 	return fmt.Sprintf(
-		"%v activates a cheat code!\n"+
-			"%v",
+		"%v activates a cheat code!\n%v",
 		p.GetName(),
 		response,
 	)
@@ -159,17 +157,16 @@ type actionFunc func(player *Player, context *game.Context) (string, bool)
 
 var actions = map[string]actionFunc{
 	"bundle": func(player *Player, context *game.Context) (string, bool) {
-		if len(player.Inventory) == 0 {
+		if len(player.GetInventory().Items) == 0 {
 			return "No items in inventory to bundle.\n", false
 		}
 
-		bundleIdxs := []int{}
-
-		for i := 0; ; i++ {
-			fmt.Println(game.ColTooltip("Select an item to bundle or bundle to open:"))
+		itemIndexes := []int{}
+		for i := 0; ; {
+			fmt.Println(game.ColTooltip("Select item to bundle or bundle to open:"))
 			fmt.Println(game.ListOrderedItemsWithMapFunc(
-				player.Inventory, func(idx int, item game.Item) string {
-					if slices.Contains(bundleIdxs, idx) {
+				player.GetInventory().Items, func(idx int, item game.Item) string {
+					if slices.Contains(itemIndexes, idx) {
 						return game.ColSystem("(selected for bundling)")
 					}
 					return item.GetDesc()
@@ -177,210 +174,168 @@ var actions = map[string]actionFunc{
 			))
 			input := game.Input()
 
-			index, err := strconv.Atoi(input)
+			itemIndex, indexErr := strconv.Atoi(input)
 
-			if err == nil && slices.Contains(bundleIdxs, index) {
-				bundleIdxs = append(
-					bundleIdxs[:slices.Index(bundleIdxs, index)],
-					bundleIdxs[slices.Index(bundleIdxs, index)+1:]...,
-				)
+			if indexErr == nil && slices.Contains(itemIndexes, itemIndex) {
+				itemIndexes = slices.Delete(
+					itemIndexes,
+					slices.Index(itemIndexes, itemIndex),
+					slices.Index(itemIndexes, itemIndex)+1,
+					)
 
 				fmt.Printf(
 					"%v deselected for bundling.\n\n",
-					player.Inventory[index].GetName(),
+					player.GetInventory().Items[itemIndex].GetName(),
 				)
 
+				i--
 				continue
 			}
 
-			newBundle, isBundleSelected := player.Inventory[index].(*Bundle)
+			bundle, isBundleSelected := player.GetInventory().Items[itemIndex].(*Bundle)
 
 			if i == 0 && isBundleSelected {
-				// Unpack existing bundle
-				for _, item := range newBundle.Items {
-					player.Inventory = append(player.Inventory, item)
-				}
-				player.Inventory = append(
-					player.Inventory[:index],
-					player.Inventory[index+1:]...,
-				)
+				removeResponse := player.GetInventory().RemoveItems([]int{ itemIndex })
+				addResponse := player.GetInventory().AddItems(bundle.Items)
 
 				return fmt.Sprintf(
-					"%v unbundles %v.\n",
-					player.GetName(),
-					game.ListItems(newBundle.Items),
-				), false
+					"Unbundling items...\n%s%s",
+					addResponse,
+					removeResponse,
+					), false
 			}
 
-			isInvalidInput := err != nil || index < 0 || index >= len(player.Inventory)
-			if isInvalidInput || isBundleSelected {
-				if len(bundleIdxs) < 1 {
+			if !player.GetInventory().HasIndex(itemIndex) || indexErr != nil || isBundleSelected {
+				if len(itemIndexes) < 1 {
 					return "Nothing to bundle.\n", false
 				}
 
-				items := []game.Item{}
-				for _, idx := range bundleIdxs {
-					items = append(items, player.Inventory[idx])
-				}
-				// Sort bundleIdxs in descending order
-				// to safely remove items from inventory
-				// without affecting the indexes of yet-to-be-removed items
-				sort.Slice(bundleIdxs, func(i, j int) bool {
-					return bundleIdxs[i] > bundleIdxs[j]
-				})
-				// Remove bundled items from inventory
-				// after collecting them to bundle
-				// to avoid index shifting issues
-				for _, idx := range bundleIdxs {
-					player.Inventory = append(
-						player.Inventory[:idx],
-						player.Inventory[idx+1:]...,
+				for _, idx := range itemIndexes {
+					bundle.Items = append(
+						bundle.Items,
+						player.GetInventory().Items[idx],
 					)
 				}
-
-				var wording string
-				if isInvalidInput {
-					wording = "creates a"
-					newBundle = NewBundle(
-						items,
-					)
-					player.Inventory = append(player.Inventory, newBundle)
-				} else {
-					wording = "fills the"
-					newBundle.Items = append(newBundle.Items, items...)
-				}
+				removeResponse := player.GetInventory().RemoveItems(itemIndexes)
+				addResponse := player.GetInventory().AddItems([]game.Item{ bundle })
 
 				return fmt.Sprintf(
-					"%v %v %v with %v.\n",
-					player.GetName(),
-					wording,
-					newBundle.GetName(),
-					game.ListItems(newBundle.Items),
+					"Bundling items...\n%s%s",
+					addResponse,
+					removeResponse,
 				), false
 			}
 
-			bundleIdxs = append(bundleIdxs, index)
+			itemIndexes = append(itemIndexes, itemIndex)
 
 			fmt.Printf(
 				"%v selected for bundling.\n%v\n\n",
-				player.Inventory[index].GetName(),
+				player.GetInventory().Items[itemIndex].GetName(),
 				game.ColTooltip("(Enter 'x' to finish bundling)"),
 			)
+
+			i++
 		}
 	},
 	"inventory": func(player *Player, context *game.Context) (string, bool) {
-		if len(player.Inventory) == 0 {
+		if len(player.GetInventory().Items) == 0 {
 			return game.ColTooltip("No inventory items.\n"), false
 		}
-		return fmt.Sprintf("%s\n", game.ListOrderedItems(player.Inventory)), false
+		return game.ListOrderedItems(player.GetInventory().Items) + "\n", false
 	},
 	"use": func(player *Player, context *game.Context) (string, bool) {
-		if len(player.Inventory) == 0 {
+		if len(player.GetInventory().Items) == 0 {
 			return "No item in inventory to use.", false
 		}
 
-		neighbors := context.World.GetOccupantsSameTile(player)
-
-		if len(neighbors) == 0 {
-			return "No targets available to use the item on.\n", false
-		}
-
 		fmt.Println(game.ColTooltip("Select an item to use:"))
-		fmt.Println(game.ListOrderedItems(player.Inventory))
+		fmt.Println(game.ListOrderedItems(player.GetInventory().Items))
 		input := game.Input()
 
-		index, err := strconv.Atoi(input)
-		if err != nil || index < 0 || index >= len(player.Inventory) {
-			return fmt.Sprintf(
-				"Invalid item selection. (%v)\n",
-				game.ColTooltip(input),
-			), false
+		itemIndex, indexErr := strconv.Atoi(input)
+
+		if !player.GetInventory().HasIndex(itemIndex) || indexErr != nil {
+			return game.SnipInvalidItemIndex(itemIndex), false
 		}
-		item := player.Inventory[index]
 
-		var result string
-		var endTurn, consume bool
+		item := player.GetInventory().Items[itemIndex]
 
-		if itemUseEntity, ok := item.(game.ItemUseEntity); ok {
+		if _, ok := item.(game.ItemUseEntity); ok {
+			nearby := context.World.GetOccupantsSameTile(player)
+
 			fmt.Printf(
 				game.ColTooltip("Select a target:\n%v\n"),
-				game.ListOrderedEntities(neighbors),
+				game.ListOrderedEntities(nearby),
 				)
-
 			var targetInput = game.Input()
-			targetIndex, err := strconv.Atoi(targetInput)
-			if err != nil || targetIndex < 0 || targetIndex >= len(neighbors) {
+
+			targetIndex, targetErr := strconv.Atoi(targetInput)
+
+			if targetErr != nil || targetIndex < 0 || targetIndex >= len(nearby) {
 				return fmt.Sprintf(
 					"Invalid target selection. (%v)\n",
 					game.ColTooltip(targetInput),
 					), false
 			}
-			target := neighbors[targetIndex]
 
-			result, endTurn, consume = itemUseEntity.UseOnEntity(
-				player, target, context,
-				)
-		} else if itemUseDirection, ok := item.(game.ItemUseDirection); ok {
+			target := nearby[targetIndex]
+
+			response, ok := player.GetInventory().UseItemOnEntity(itemIndex, target)
+			return response, ok
+		} else if _, ok := item.(game.ItemUseDirection); ok {
 			fmt.Printf(
 				game.ColTooltip("Choose a direction to use: %v\n"),
 				game.ListDirections(),
 			)
-
 			var directionInput = game.Input()
+
 			var dx, dy, ok = game.DirToDelta(directionInput)
 			if !ok {
 				return game.SnipInvalidDirection(directionInput), false
 			}
 
-			result, endTurn, consume = itemUseDirection.UseInDirection(
-				player, dx, dy, directionInput, context,
-				)
+			response, ok := player.GetInventory().UseItemInDirection(
+				itemIndex,
+				dx,
+				dy,
+				directionInput,
+			)
+			return response, ok
 		} else {
 			return game.SnipItemCannotBeUsedBy(player, item), false
 		}
-
-		if consume {
-			result += fmt.Sprintf(
-				"%v removed from inventory.\n",
-				item.GetName(),
-			)
-
-			player.Inventory = append(
-				player.Inventory[:index],
-				player.Inventory[index+1:]...,
-			)
-		}
-
-		return result, endTurn
 	},
 	"examine": func(player *Player, context *game.Context) (string, bool) {
 		neighbors := context.World.GetOccupantsSameTile(player)
-
 		if len(neighbors) == 0 {
 			return "Nothing nearby to examine.\n", false
 		}
 
-		fmt.Println(game.ColTooltip("Select what you want to examine:"))
-		fmt.Println(game.ListOrderedEntities(neighbors))
+		fmt.Printf(
+			game.ColTooltip("Select what you want to examine:\n%v\n"),
+			game.ListOrderedEntities(neighbors),
+			)
 		input := game.Input()
 
-		index, err := strconv.Atoi(input)
-		if err != nil || index < 0 || index >= len(neighbors) {
+		targetIndex, indexErr := strconv.Atoi(input)
+
+		if indexErr != nil || targetIndex < 0 || targetIndex >= len(neighbors) {
 			return fmt.Sprintf(
 				"Invalid selection. (%v)\n",
 				game.ColTooltip(input),
 			), false
 		}
 
-		entity := neighbors[index]
-		response := entity.GetDesc(player)
+		target := neighbors[targetIndex]
+
+		response := target.GetDesc(player)
 		return response, false
 	},
 	"move": func(player *Player, context *game.Context) (string, bool) {
 		fmt.Printf(
-			"%v %v\n",
-			game.ColTooltip("Choose a direction to move:"),
-			game.ListDirections())
+			game.ColTooltip("Choose a direction to move: %v\n"),
+			game.ListDirections(),
+			)
 		input := game.Input()
 
 		dx, dy, valid := game.DirToDelta(input)
@@ -388,12 +343,9 @@ var actions = map[string]actionFunc{
 			return game.SnipInvalidDirection(input), false
 		}
 
-		response, ok := context.World.MoveInDirection(player, dx, dy)
+		response, endTurn := player.GetMovement().Move(dx, dy, &context.World)
 
-		speedPotionActive := player.speedPotion
-		player.speedPotion = false
-
-		return response, ok && !speedPotionActive
+		return response, endTurn
 	},
 	"look": func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {
@@ -404,20 +356,17 @@ var actions = map[string]actionFunc{
 		}
 
 		fmt.Printf(
-			"%v %v\n",
-			game.ColTooltip("Choose a direction to look:"),
-			game.ListDirections())
+			game.ColTooltip("Choose a direction to look: %v\n"),
+			game.ListDirections(),
+			)
 		input := game.Input()
 
 		dx, dy, valid := game.DirToDelta(input)
 		if !valid {
-			return fmt.Sprintf(
-				"Invalid direction. (%v)\n",
-				game.ColTooltip(input),
-			), false
+			return game.SnipInvalidDirection(input), false
 		}
 
-		currX, currY, ok := context.World.GetEntityPos(player)
+		px, py, ok := context.World.GetEntityPos(player)
 		if !ok {
 			return fmt.Sprintf(
 				"%v is lost.",
@@ -428,7 +377,7 @@ var actions = map[string]actionFunc{
 		player.looksThisTurn++
 
 		for dist := 1; dist < context.World.Size; dist++ {
-			tx, ty := currX+(dx*dist), currY+(dy*dist)
+			tx, ty := px+(dx*dist), py+(dy*dist)
 
 			if tx < 0 || tx >= context.World.Size || ty < 0 || ty >= context.World.Size {
 				break

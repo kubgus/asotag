@@ -9,6 +9,12 @@ type Pickaxe struct {
 	Material Material
 }
 
+func NewPickaxe(material Material) *Pickaxe {
+	return &Pickaxe{
+		Material: material,
+	}
+}
+
 func (p *Pickaxe) GetName() string {
 	return game.ColItem(p.Material.String() + " Pickaxe")
 }
@@ -24,32 +30,25 @@ func (p *Pickaxe) UseOnEntity(user, target game.Entity, _ *game.Context) (string
 	var loot []game.Item
 
 	if deposit, ok := target.(*Deposit); ok {
-		if deposit.Type > p.MaxMineable() || deposit.Amount == 0 {
+		if deposit.Material > p.MaxMineable() {
 			return game.SnipCannotUseItemOn(user, target, p), false, false
 		}
-		loot = deposit.GetLoot(user)
+		loot = deposit.GetLoot().Drop()
 	} else if chest, ok := target.(*Chest); ok {
 		if !chest.IsUnlocked {
 			return game.SnipCannotUseItemOn(user, target, p), false, false
 		}
-		loot = chest.GetLoot(user)
+		loot = chest.GetLoot().Drop()
 	} else {
 		return game.SnipCannotUseItemOn(user, target, p), false, false
 	}
 
 	if player, ok := user.(*Player); ok {
-		player.CollectLoot(loot)
-	} else {
-		return game.SnipItemCannotBeUsedBy(user, p), false, false
+		response := player.GetInventory().AddItems(loot)
+		return response, len(loot) > 0, false
 	}
 
-	return fmt.Sprintf(
-		"%v uses %v on %v and obtains %v.\n",
-		user.GetName(),
-		p.GetName(),
-		target.GetName(),
-		game.ListItems(loot),
-	), true, false
+	return game.SnipItemCannotBeUsedBy(user, p), false, false
 }
 
 func (p *Pickaxe) MaxMineable() Material {

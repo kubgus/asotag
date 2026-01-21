@@ -44,15 +44,15 @@ func main() {
 		context.ExecuteRound()
 
 		// Lose by player death
-		if player.Health <= 0 {
+		if player.GetHealth().CurrentHealth <= 0 {
 			lose = true
 		}
 
 		// Win by all enemies defeated
 		allEnemiesDefeated := true
 		for _, enemy := range enemies {
-			if enemyHealth, ok := enemy.(game.EntityHealth); ok {
-				if enemyHealth.GetHealth() > 0 {
+			if enemyHealth, ok := enemy.(game.HasHealth); ok {
+				if enemyHealth.GetHealth().CurrentHealth > 0 {
 					allEnemiesDefeated = false
 					break
 				}
@@ -107,12 +107,12 @@ func addPlayer(context *game.Context) *content.Player {
 		true,
 	)
 
-	player.Inventory = []game.Item{
+	player.GetInventory().AddItems([]game.Item{
 		content.NewSwordWooden(),
 		content.NewPickaxe(content.MaterialWood),
 		content.NewSpearWooden(),
 		content.NewHealingPotionMinor(),
-	}
+	})
 
 	return player
 }

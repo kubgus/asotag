@@ -2,23 +2,47 @@ package content
 
 import (
 	"asotag/game"
+	"asotag/utils"
 	"fmt"
-)
-
-var (
-	lootTableChest = map[game.Item]int{
-		NewHealingPotionMinor(): 50,
-		NewKey():                30,
-		NewSpeedPotion():        30,
-		NewHealingPotionMajor(): 15,
-		NewSwordIron():          5,
-		NewSpearIron():          5,
-	}
 )
 
 type Chest struct {
 	IsUnlocked bool
-	Contents   []game.Item
+
+	loot LootModule
+}
+
+func NewChest() *Chest {
+	isUnlocked, _ := utils.RandChoice([]bool{true, false})
+
+	chest := Chest{
+		IsUnlocked: isUnlocked,
+
+		loot: LootModule{
+			LootTable: 	map[game.Item]int{
+				NewHealingPotionMinor(): 50,
+				NewKey():                30,
+				NewSpeedPotion():        30,
+				NewHealingPotionMajor(): 15,
+				NewSwordIron():          5,
+				NewSpearIron():          5,
+			},
+			AmountTable: map[int]int{
+				1: 50,
+				2: 75,
+				3: 100,
+				4: 50,
+			},
+			LootLimit: 1,
+		},
+	}
+
+	return &chest
+}
+
+func (c *Chest) GetLoot() *LootModule {
+	c.loot.Init(c)
+	return &c.loot
 }
 
 func (c *Chest) GetName() string {
@@ -27,7 +51,7 @@ func (c *Chest) GetName() string {
 
 func (c *Chest) GetStatus() string {
 	if c.IsUnlocked {
-		if len(c.Contents) == 0 {
+		if c.GetLoot().LootLimit < 0 {
 			return game.ColHealth("Empty")
 		}
 		return game.ColHealth("Unlocked")
@@ -37,11 +61,10 @@ func (c *Chest) GetStatus() string {
 
 func (c *Chest) GetDesc(user game.Entity) string {
 	if c.IsUnlocked {
-		if len(c.Contents) > 0 {
+		if c.GetLoot().LootLimit > 0 {
 			return fmt.Sprintf(
-				"%v is unlocked and contains: %v. Can be mined to loot.\n",
+				"%v is unlocked. Mine it to gain loot.\n",
 				c.GetName(),
-				game.ListItems(c.Contents),
 			)
 		}
 		return fmt.Sprintf(
@@ -54,13 +77,4 @@ func (c *Chest) GetDesc(user game.Entity) string {
 			c.GetName(),
 		)
 	}
-}
-
-func (c *Chest) GetLoot(user game.Entity) []game.Item {
-	c.IsUnlocked = true
-
-	response := c.Contents
-	c.Contents = []game.Item{}
-
-	return response
 }

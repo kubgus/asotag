@@ -12,6 +12,22 @@ type Spear struct {
 	MaxDamage int
 }
 
+func NewSpear(name string, minDamage, maxDamage int) *Spear {
+	return &Spear{
+		Name:      name,
+		MinDamage: minDamage,
+		MaxDamage: maxDamage,
+	}
+}
+
+func NewSpearWooden() *Spear {
+	return NewSpear("Wooden Spear", 4, 8)
+}
+
+func NewSpearIron() *Spear {
+	return NewSpear("Iron Spear", 11, 18)
+}
+
 func (s *Spear) GetName() string {
 	return game.ColItem(s.Name)
 }
@@ -41,9 +57,9 @@ func (s *Spear) UseInDirection(
 	)
 
 	var target game.Entity
-	var targetHealth game.EntityHealth
+	var targetHealth game.HasHealth
 	for _, entity := range utils.Shuffled(targets) {
-		if entityHealth, ok := entity.(game.EntityHealth); ok {
+		if entityHealth, ok := entity.(game.HasHealth); ok {
 			target = entity
 			targetHealth = entityHealth
 			break
@@ -60,15 +76,14 @@ func (s *Spear) UseInDirection(
 
 	damage := utils.RandIntInRange(s.MinDamage, s.MaxDamage)
 
-	response, alive := targetHealth.AddHealth(-damage)
+	response := targetHealth.GetHealth().Change(-damage)
 
-	if !alive {
-		if targetLoot, ok := target.(game.EntityLoot); ok {
-			loot := targetLoot.GetLoot(user)
-			if player, ok := user.(*Player); ok {
-				if responseLoot, ok := player.CollectLoot(loot); ok {
-					response += "\n" + responseLoot
-				}
+	// TODO: temporary solution
+	if targetHealth.GetHealth().CurrentHealth <= 0 {
+		if targetLoot, hasLoot := target.(HasLoot); hasLoot {
+			if player, isPlayer := user.(*Player); isPlayer {
+				loot := targetLoot.GetLoot().Drop()
+				response += "\n" + player.GetInventory().AddItems(loot)
 			} else {
 				return game.SnipItemCannotBeUsedBy(user, s), false, false
 			}
@@ -76,12 +91,11 @@ func (s *Spear) UseInDirection(
 	}
 
 	return fmt.Sprintf(
-		"%v throws %v %v at %v, dealing %v damage! %v\n",
+		"%s throws %s %s at %s! %v\n",
 		user.GetName(),
 		s.GetName(),
 		game.ColAction(direction),
 		target.GetName(),
-		game.FormatDamage(damage, false),
 		response,
 	), true, true
 }

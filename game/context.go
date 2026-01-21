@@ -7,14 +7,15 @@ import (
 )
 
 type Context struct {
-	World world
+	World World
 
 	CheatRevealMap bool
 }
 
 func (c *Context) ExecuteRound() {
 	for _, entity := range c.World.EntityOrder {
-		if entityHealth, ok := entity.(EntityHealth); ok && entityHealth.GetHealth() <= 0 {
+		if entityHealth, ok := entity.(HasHealth);
+		ok && entityHealth.GetHealth().CurrentHealth <= 0 {
 			c.World.Remove(entity, true)
 			continue
 		}
@@ -35,7 +36,8 @@ func (c *Context) ExecuteRound() {
 
 				fmt.Println(response)
 
-				if entityHealth, ok := entity.(EntityHealth); ok && entityHealth.GetHealth() <= 0 {
+				if entityHealth, ok := entity.(HasHealth);
+				ok && entityHealth.GetHealth().CurrentHealth <= 0 {
 					c.World.Remove(entity, true)
 					break
 				}

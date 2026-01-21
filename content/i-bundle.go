@@ -9,6 +9,12 @@ type Bundle struct {
 	Items []game.Item
 }
 
+func NewBundle(items []game.Item) *Bundle {
+	return &Bundle{
+		Items: items,
+	}
+}
+
 func (b *Bundle) GetName() string {
 	return game.ColItem("Bundle")
 }
@@ -31,17 +37,15 @@ func (b *Bundle) UseOnEntity(user, target game.Entity, _ *game.Context) (string,
 
 	if craftedItem != nil {
 		if player, ok := user.(*Player); ok {
-			player.CollectLoot([]game.Item{craftedItem})
+			addResponse := player.GetInventory().AddItems([]game.Item{craftedItem})
+
+			return fmt.Sprintf(
+				"Crafting successful!\n%v%v",
+				addResponse,
+			), true, true
 		} else {
 			return game.SnipItemCannotBeUsedBy(user, b), false, false
 		}
-
-		return fmt.Sprintf(
-			"%v uses %v to craft %v.\n",
-			user.GetName(),
-			game.ListItems(b.Items),
-			craftedItem.GetName(),
-		), true, true
 	}
 
 	if craftingAllowed {

@@ -12,6 +12,30 @@ type Sword struct {
 	MaxDamage int
 }
 
+func NewSword(name string, minDamage, maxDamage int) *Sword {
+	return &Sword{
+		Name:      name,
+		MinDamage: minDamage,
+		MaxDamage: maxDamage,
+	}
+}
+
+func NewSwordWooden() *Sword {
+	return NewSword("Wooden Sword", 5, 10)
+}
+
+func NewSwordStone() *Sword {
+	return NewSword("Stone Sword", 9, 16)
+}
+
+func NewSwordIron() *Sword {
+	return NewSword("Iron Sword", 12, 20)
+}
+
+func NewSwordGold() *Sword {
+	return NewSword("Gold Sword", 17, 35)
+}
+
 func (s *Sword) GetName() string {
 	return game.ColItem(s.Name)
 }
@@ -25,22 +49,21 @@ func (s *Sword) GetDesc() string {
 }
 
 func (s *Sword) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
-	targetHealth, ok := target.(game.EntityHealth)
+	targetHealth, ok := target.(game.HasHealth)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, s), false, false
 	}
 
 	damage := utils.RandIntInRange(s.MinDamage, s.MaxDamage)
 
-	response, alive := targetHealth.AddHealth(-damage)
+	response := targetHealth.GetHealth().Change(-damage)
 
-	if !alive {
-		if targetLoot, ok := target.(game.EntityLoot); ok {
-			loot := targetLoot.GetLoot(user)
-			if player, ok := user.(*Player); ok {
-				if responseLoot, ok := player.CollectLoot(loot); ok {
-					response += "\n" + responseLoot
-				}
+	// TODO: temporary solution
+	if targetHealth.GetHealth().CurrentHealth <= 0 {
+		if targetLoot, hasLoot := target.(HasLoot); hasLoot {
+			if player, isPlayer := user.(*Player); isPlayer {
+				loot := targetLoot.GetLoot().Drop()
+				response += "\n" + player.GetInventory().AddItems(loot)
 			} else {
 				return game.SnipItemCannotBeUsedBy(user, s), false, false
 			}
@@ -48,11 +71,10 @@ func (s *Sword) UseOnEntity(user, target game.Entity, _ *game.Context) (string, 
 	}
 
 	return fmt.Sprintf(
-		"%v slices %v with a %v for %v damage! %v\n",
+		"%s slices %s with a %s!\n%s\n",
 		user.GetName(),
 		target.GetName(),
 		s.GetName(),
-		game.FormatDamage(damage, false),
 		response,
 	), true, false
 }

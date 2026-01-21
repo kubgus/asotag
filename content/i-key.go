@@ -7,6 +7,10 @@ import (
 
 type Key struct{}
 
+func NewKey() *Key {
+	return &Key{}
+}
+
 func (k *Key) GetName() string {
 	return game.ColItem("Key")
 }
