@@ -124,10 +124,10 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 	if px, py, ok := context.World.GetEntityPos(p); ok {
 		context.World.Add(NewWorkbench(), px, py, false)
 
-		context.World.Add(NewDepositTree(50, 100), px, py, false)
-		context.World.Add(NewDepositRock(50, 100), px, py, false)
-		context.World.Add(NewDepositIronVein(50, 100), px, py, false)
-		context.World.Add(NewDepositGoldVein(50, 100), px, py, false)
+		context.World.Add(NewDepositTree(), px, py, false)
+		context.World.Add(NewDepositRock(), px, py, false)
+		context.World.Add(NewDepositIronVein(), px, py, false)
+		context.World.Add(NewDepositGoldVein(), px, py, false)
 
 		for range 5 {
 			unlockedChest := NewChest()
@@ -136,7 +136,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 		}
 	}
 	response := p.GetInventory().AddItems([]game.Item{
-		NewSwordGold(),
+		NewSwordGolden(),
 		NewPickaxe(MaterialGold),
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),

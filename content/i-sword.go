@@ -33,8 +33,8 @@ func NewSwordIron() *Sword {
 	return NewSword("Iron Sword", 12, 20)
 }
 
-func NewSwordGold() *Sword {
-	return NewSword("Gold Sword", 17, 35)
+func NewSwordGolden() *Sword {
+	return NewSword("Golden Sword", 17, 35)
 }
 
 func (s *Sword) GetName() string {

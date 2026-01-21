@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	worldSize = 10
+	worldSize = 15
 
 	enemyCountGoblin = 7
 
@@ -21,9 +21,6 @@ const (
 	locationCountDepositStone = 7
 	locationCountDepositIron  = 5
 	locationCountDepositGold  = 3
-
-	depositResCountMin = 3
-	depositResCountMax = 6
 )
 
 func main() {
@@ -160,7 +157,7 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositWood {
-		woodDeposit := content.NewDepositTree(depositResCountMin, depositResCountMax)
+		woodDeposit := content.NewDepositTree()
 		context.World.Add(
 			woodDeposit,
 			rand.IntN(worldSize),
@@ -171,7 +168,7 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositStone {
-		stoneDeposit := content.NewDepositRock(depositResCountMin, depositResCountMax)
+		stoneDeposit := content.NewDepositRock()
 		context.World.Add(
 			stoneDeposit,
 			rand.IntN(worldSize),
@@ -182,7 +179,7 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositIron {
-		ironDeposit := content.NewDepositIronVein(depositResCountMin, depositResCountMax)
+		ironDeposit := content.NewDepositIronVein()
 		context.World.Add(
 			ironDeposit,
 			rand.IntN(worldSize),
@@ -193,7 +190,7 @@ func addLocations(context *game.Context) []game.Entity {
 	}
 
 	for range locationCountDepositGold {
-		goldDeposit := content.NewDepositGoldVein(depositResCountMin, depositResCountMax)
+		goldDeposit := content.NewDepositGoldVein()
 		context.World.Add(
 			goldDeposit,
 			rand.IntN(worldSize),

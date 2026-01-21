@@ -2,7 +2,6 @@ package content
 
 import (
 	"asotag/game"
-	"asotag/utils"
 	"fmt"
 )
 
@@ -13,7 +12,7 @@ type Deposit struct {
 	loot LootModule
 }
 
-func NewDeposit(name string, material Material, amount int) *Deposit {
+func NewDeposit(name string, material Material) *Deposit {
 	deposit := Deposit{
 		Name:     name,
 		Material: material,
@@ -23,7 +22,11 @@ func NewDeposit(name string, material Material, amount int) *Deposit {
 				NewResource(material): 100,
 			},
 			AmountTable: map[int]int{
-				amount: 100,
+				2: 25,
+				3: 50,
+				4: 100,
+				5: 100,
+				6: 50,
 			},
 			LootLimit: 1,
 		},
@@ -37,20 +40,20 @@ func (d *Deposit) GetLoot() *LootModule {
 	return &d.loot
 }
 
-func NewDepositTree(min, max int) *Deposit {
-	return NewDeposit("Tree", MaterialWood, utils.RandIntInRange(min, max))
+func NewDepositTree() *Deposit {
+	return NewDeposit("Tree", MaterialWood)
 }
 
-func NewDepositRock(min, max int) *Deposit {
-	return NewDeposit("Rock", MaterialStone, utils.RandIntInRange(min, max))
+func NewDepositRock() *Deposit {
+	return NewDeposit("Rock", MaterialStone)
 }
 
-func NewDepositIronVein(min, max int) *Deposit {
-	return NewDeposit("Iron Vein", MaterialIron, utils.RandIntInRange(min, max))
+func NewDepositIronVein() *Deposit {
+	return NewDeposit("Iron Vein", MaterialIron)
 }
 
-func NewDepositGoldVein(min, max int) *Deposit {
-	return NewDeposit("Gold Vein", MaterialGold, utils.RandIntInRange(min, max))
+func NewDepositGoldVein() *Deposit {
+	return NewDeposit("Gold Vein", MaterialGold)
 }
 
 func (d *Deposit) GetName() string {

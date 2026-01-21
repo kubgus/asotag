@@ -25,7 +25,7 @@ var workbenchRecipes = map[game.Item][]game.Item{
 		NewResource(MaterialIron),
 		NewResource(MaterialWood),
 	},
-	NewSwordGold(): {
+	NewSwordGolden(): {
 		NewResource(MaterialGold),
 		NewResource(MaterialGold),
 		NewResource(MaterialGold),

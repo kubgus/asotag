@@ -20,18 +20,19 @@ func NewChest() *Chest {
 
 		loot: LootModule{
 			LootTable: map[game.Item]int{
+				NewKey():                50,
 				NewHealingPotionMinor(): 50,
-				NewKey():                30,
-				NewSpeedPotion():        30,
-				NewHealingPotionMajor(): 15,
-				NewSwordIron():          5,
-				NewSpearIron():          5,
+				NewHealingPotionMajor(): 25,
+				NewSpeedPotion():        25,
+				NewSwordIron():          10,
+				NewSpearIron():          10,
+				NewSwordGolden():        5,
 			},
 			AmountTable: map[int]int{
-				1: 50,
-				2: 75,
+				1: 25,
+				2: 100,
 				3: 100,
-				4: 50,
+				4: 25,
 			},
 			LootLimit: 1,
 		},
