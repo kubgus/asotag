@@ -49,7 +49,10 @@ func (s *Sword) GetDesc() string {
 	)
 }
 
-func (s *Sword) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (s *Sword) UseOnEntity(
+	user, target game.Entity,
+	_ *game.World,
+) (string, bool, bool) {
 	targetHealth, ok := target.(game.HasHealth)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, s), false, false

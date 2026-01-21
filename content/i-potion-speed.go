@@ -19,7 +19,10 @@ func (p *SpeedPotion) GetDesc() string {
 	return "Makes next move not end turn."
 }
 
-func (p *SpeedPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (p *SpeedPotion) UseOnEntity(
+	user, target game.Entity,
+	_ *game.Context,
+) (string, bool, bool) {
 	targetMovement, ok := target.(HasMovement)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, p), false, false

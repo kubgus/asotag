@@ -11,8 +11,7 @@ type HasIntentory interface {
 }
 
 type InventoryModule struct {
-	entity  game.Entity
-	context *game.Context
+	entity game.Entity
 
 	Items []game.Item
 }
@@ -66,7 +65,11 @@ func (im *InventoryModule) RemoveItems(indexes []int) string {
 	)
 }
 
-func (im *InventoryModule) UseItemOnEntity(index int, target game.Entity) (string, bool) {
+func (im *InventoryModule) UseItemOnEntity(
+	index int,
+	target game.Entity,
+	context *game.Context,
+) (string, bool) {
 	if !im.HasIndex(index) {
 		return game.SnipInvalidItemIndex(index), false
 	}
@@ -76,7 +79,7 @@ func (im *InventoryModule) UseItemOnEntity(index int, target game.Entity) (strin
 		response, ok, consume := correctItem.UseOnEntity(
 			im.entity,
 			target,
-			im.context,
+			context,
 		)
 
 		var removeResponse string
@@ -95,7 +98,12 @@ func (im *InventoryModule) UseItemOnEntity(index int, target game.Entity) (strin
 	), false
 }
 
-func (im *InventoryModule) UseItemInDirection(index int, dx, dy int, direction string) (string, bool) {
+func (im *InventoryModule) UseItemInDirection(
+	index int,
+	dx, dy int,
+	direction string,
+	context *game.Context,
+) (string, bool) {
 	if !im.HasIndex(index) {
 		return game.SnipInvalidItemIndex(index), false
 	}
@@ -107,7 +115,7 @@ func (im *InventoryModule) UseItemInDirection(index int, dx, dy int, direction s
 			dx,
 			dy,
 			direction,
-			im.context,
+			context,
 		)
 
 		var removeResponse string
@@ -115,11 +123,7 @@ func (im *InventoryModule) UseItemInDirection(index int, dx, dy int, direction s
 			removeResponse = im.RemoveItems([]int{index})
 		}
 
-		return fmt.Sprintf(
-			"%s%s",
-			response,
-			removeResponse,
-		), ok
+		return response + removeResponse, ok
 	}
 
 	return fmt.Sprintf(

@@ -145,7 +145,11 @@ func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 			continue
 		}
 
-		response, _ := g.GetInventory().UseItemOnEntity(0, entity)
+		response, _ := g.GetInventory().UseItemOnEntity(
+			0,
+			entity,
+			context,
+		)
 		return response, true
 	}
 

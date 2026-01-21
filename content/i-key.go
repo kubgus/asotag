@@ -19,7 +19,10 @@ func (k *Key) GetDesc() string {
 	return "A small key that can unlock chests."
 }
 
-func (k *Key) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (k *Key) UseOnEntity(
+	user, target game.Entity,
+	_ *game.Context,
+) (string, bool, bool) {
 	chest, ok := target.(*Chest)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, k), false, false

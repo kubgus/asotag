@@ -284,7 +284,11 @@ var actions = map[string]actionFunc{
 
 			target := nearby[targetIndex]
 
-			response, ok := player.GetInventory().UseItemOnEntity(itemIndex, target)
+			response, ok := player.GetInventory().UseItemOnEntity(
+				itemIndex,
+				target,
+				context,
+			)
 			return response, ok
 		} else if _, ok := item.(game.ItemUseDirection); ok {
 			fmt.Printf(
@@ -303,6 +307,7 @@ var actions = map[string]actionFunc{
 				dx,
 				dy,
 				directionInput,
+				context,
 			)
 			return response, ok
 		} else {

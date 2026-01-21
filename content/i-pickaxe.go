@@ -26,7 +26,10 @@ func (p *Pickaxe) GetDesc() string {
 	)
 }
 
-func (p *Pickaxe) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
+func (p *Pickaxe) UseOnEntity(
+	user, target game.Entity,
+	_ *game.Context,
+) (string, bool, bool) {
 	var loot []game.Item
 
 	if deposit, ok := target.(*Deposit); ok {
