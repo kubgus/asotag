@@ -7,6 +7,10 @@ import (
 
 type SpeedPotion struct{}
 
+func NewSpeedPotion() *SpeedPotion {
+	return &SpeedPotion{}
+}
+
 func (p *SpeedPotion) GetName() string {
 	return game.ColItem("Speed Potion")
 }
@@ -16,12 +20,12 @@ func (p *SpeedPotion) GetDesc() string {
 }
 
 func (p *SpeedPotion) UseOnEntity(user, target game.Entity, _ *game.Context) (string, bool, bool) {
-	targetSpeedPotionable, ok := target.(EntitySpeedPotion)
+	targetMovement, ok := target.(HasMovement)
 	if !ok {
 		return game.SnipCannotUseItemOn(user, target, p), false, false
 	}
 
-	targetSpeedPotionable.ApplySpeedPotion()
+	targetMovement.GetMovement().ExtraMoves += 1
 
 	return fmt.Sprintf(
 		"%v uses %v on %v. %v's next move won't end their turn!\n",

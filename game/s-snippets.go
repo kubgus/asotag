@@ -25,3 +25,10 @@ func SnipInvalidDirection(input string) string {
 		ColTooltip(input),
 	)
 }
+
+func SnipInvalidItemIndex(index int) string {
+	return fmt.Sprintf(
+		"Invalid item selection (%s).\n",
+		ColTooltip(fmt.Sprint(index)),
+	)
+}

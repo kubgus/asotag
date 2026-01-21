@@ -2,13 +2,55 @@ package content
 
 import (
 	"asotag/game"
+	"asotag/utils"
 	"fmt"
 )
 
 type Deposit struct {
-	Name   string
-	Type   Material
-	Amount int
+	Name     string
+	Material Material // helper
+
+	loot LootModule
+}
+
+func NewDeposit(name string, material Material, amount int) *Deposit {
+	deposit := Deposit{
+		Name:     name,
+		Material: material,
+
+		loot: LootModule{
+			LootTable: map[game.Item]int{
+				NewResource(material): 100,
+			},
+			AmountTable: map[int]int{
+				amount: 100,
+			},
+			LootLimit: 1,
+		},
+	}
+
+	return &deposit
+}
+
+func (d *Deposit) GetLoot() *LootModule {
+	d.loot.Init(d)
+	return &d.loot
+}
+
+func NewDepositTree(min, max int) *Deposit {
+	return NewDeposit("Tree", MaterialWood, utils.RandIntInRange(min, max))
+}
+
+func NewDepositRock(min, max int) *Deposit {
+	return NewDeposit("Rock", MaterialStone, utils.RandIntInRange(min, max))
+}
+
+func NewDepositIronVein(min, max int) *Deposit {
+	return NewDeposit("Iron Vein", MaterialIron, utils.RandIntInRange(min, max))
+}
+
+func NewDepositGoldVein(min, max int) *Deposit {
+	return NewDeposit("Gold Vein", MaterialGold, utils.RandIntInRange(min, max))
 }
 
 func (d *Deposit) GetName() string {
@@ -16,26 +58,16 @@ func (d *Deposit) GetName() string {
 }
 
 func (d *Deposit) GetStatus() string {
-	if d.Amount > 0 {
-		return game.ColHealth("Full")
+	if d.GetLoot().LootLimit < 0 {
+		return game.ColHealth("Empty")
 	}
-	return game.ColHealth("Empty")
+	return game.ColHealth("Full")
 }
 
 func (d *Deposit) GetDesc(user game.Entity) string {
 	return fmt.Sprintf(
-		"%v contains a deposit of %d units of %v.\n",
+		"%v provides %v when mined.\n",
 		d.GetName(),
-		d.Amount,
-		game.ColItem(d.Type.String()),
+		game.ColItem(d.Material.String()),
 	)
-}
-
-func (d *Deposit) GetLoot(user game.Entity) []game.Item {
-	result := make([]game.Item, 0, d.Amount)
-	for i := 0; i < d.Amount; i++ {
-		result = append(result, NewResource(d.Type))
-	}
-	d.Amount = 0
-	return result
 }
