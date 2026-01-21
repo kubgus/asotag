@@ -15,12 +15,12 @@ const (
 
 	enemyCountGoblin = 7
 
-	locationCountChest        = 5
-	locationCountWorkbench    = 2
-	locationCountDepositWood  = 15
-	locationCountDepositStone = 7
-	locationCountDepositIron  = 5
-	locationCountDepositGold  = 3
+	locationCountChest        = 10
+	locationCountWorkbench    = 5
+	locationCountDepositWood  = 20
+	locationCountDepositStone = 10
+	locationCountDepositIron  = 7
+	locationCountDepositGold  = 4
 )
 
 func main() {
