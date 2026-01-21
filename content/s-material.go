@@ -24,3 +24,18 @@ func (m Material) String() string {
 		return "Mysterious Material"
 	}
 }
+
+func (m Material) AdjectiveString() string {
+	switch m {
+	case MaterialWood:
+		return "Wooden"
+	case MaterialStone:
+		return "Stone"
+	case MaterialIron:
+		return "Iron"
+	case MaterialGold:
+		return "Golden"
+	default:
+		return "Mysterious"
+	}
+}

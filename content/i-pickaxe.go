@@ -16,7 +16,7 @@ func NewPickaxe(material Material) *Pickaxe {
 }
 
 func (p *Pickaxe) GetName() string {
-	return game.ColItem(p.Material.String() + " Pickaxe")
+	return game.ColItem(p.Material.AdjectiveString() + " Pickaxe")
 }
 
 func (p *Pickaxe) GetDesc() string {
