@@ -144,6 +144,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 		NewHealingPotionSuperior(),
 		NewHealingPotionSuperior(),
 		NewSpeedPotion(),
+		NewTeleportPotion(),
 	})
 	context.CheatRevealMap = true
 	return fmt.Sprintf(
