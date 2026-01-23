@@ -12,9 +12,7 @@ type Chest struct {
 	loot LootModule
 }
 
-func NewChest() *Chest {
-	isUnlocked, _ := utils.RandChoice([]bool{true, false})
-
+func NewChest(isUnlocked bool) *Chest {
 	chest := Chest{
 		IsUnlocked: isUnlocked,
 
@@ -40,6 +38,11 @@ func NewChest() *Chest {
 	}
 
 	return &chest
+}
+
+func NewChestRandomLock() *Chest {
+	isUnlocked, _ := utils.RandChoice([]bool{true, false})
+	return NewChest(isUnlocked)
 }
 
 func (c *Chest) GetLoot() *LootModule {

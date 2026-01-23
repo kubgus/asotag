@@ -15,12 +15,13 @@ const (
 
 	enemyCountGoblin = 7
 
-	locationCountChest        = 10
-	locationCountWorkbench    = 5
-	locationCountDepositWood  = 20
-	locationCountDepositStone = 10
-	locationCountDepositIron  = 7
-	locationCountDepositGold  = 4
+	locationCountChestUnlocked = 5
+	locationCountChestLocked   = 5
+	locationCountWorkbench     = 5
+	locationCountDepositWood   = 20
+	locationCountDepositStone  = 10
+	locationCountDepositIron   = 7
+	locationCountDepositGold   = 4
 )
 
 func main() {
@@ -134,8 +135,16 @@ func addEnemies(context *game.Context) []game.Entity {
 func addLocations(context *game.Context) []game.Entity {
 	locations := []game.Entity{}
 
-	for range locationCountChest {
-		chest := content.NewChest()
+	totalChests := locationCountChestLocked + locationCountChestUnlocked
+	for i := range totalChests {
+		var isUnlocked bool
+		if i < locationCountChestUnlocked {
+			isUnlocked = true
+		} else {
+			isUnlocked = false
+		}
+
+		chest := content.NewChest(isUnlocked)
 		context.World.Add(
 			chest,
 			rand.IntN(worldSize),
