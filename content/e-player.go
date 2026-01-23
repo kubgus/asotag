@@ -130,8 +130,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 		context.World.Add(NewDepositGoldVein(), px, py, false)
 
 		for range 5 {
-			unlockedChest := NewChest()
-			unlockedChest.IsUnlocked = true
+			unlockedChest := NewChest(true)
 			context.World.Add(unlockedChest, px, py, false)
 		}
 	}
