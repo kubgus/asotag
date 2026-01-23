@@ -22,6 +22,7 @@ snapshot:
 changelog:
   sort: asc
   filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+    # don't want the changelogs to get too long
+    include:
+      - '^feat:'
+      - '^tune:'
