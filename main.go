@@ -5,8 +5,11 @@ import (
 	"asotag/game"
 	"fmt"
 	"math/rand/v2"
+	"os"
+	"os/signal"
 	"os/user"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -27,6 +30,24 @@ const (
 func main() {
 	fmt.Print(game.ColSystem("Welcome to ASOTAG!\n"))
 	fmt.Print(game.ColSystem("Defeat all enemies to win, but beware of your health!\n\n\n"))
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		fmt.Print(game.ColSystem(
+			"\n\nPress Ctrl+C again to force exit the game." +
+				"\nIf you want to cancel the current action, type 'x'. " +
+				"(or any invalid selection)\n" +
+				game.ColTooltip("> "),
+			),
+		)
+		go func() {
+			<-sigs
+			fmt.Print(game.ColSystem("\n\nForce exiting the game. Goodbye!\n"))
+			os.Exit(0)
+		}()
+	}()
 
 	context := game.Context{
 		World: *game.NewWorld(worldSize),
