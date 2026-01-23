@@ -72,14 +72,15 @@ func NewGoblin() *Goblin {
 		},
 		loot: LootModule{
 			LootTable: map[game.Item]int{
-				NewHealingPotion("Suspicious", 30): 100,
+				NewHealingPotion("Suspicious", 30): 50,
+				NewKey():                           40,
 				NewResource(MaterialGold):          10,
 			},
 			AmountTable: map[int]int{
-				0: 10,
-				1: 100,
-				2: 50,
-				3: 10,
+				0: 5,
+				1: 70,
+				2: 20,
+				3: 5,
 			},
 			DropInventoryChance: 0.1,
 			LootLimit:           1,
