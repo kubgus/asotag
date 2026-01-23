@@ -53,7 +53,7 @@ func main() {
 		World: *game.NewWorld(worldSize),
 	}
 
-	player := addPlayer(&context)
+	player := addPlayer(&context, getDefaultPlayerName())
 	enemies := addEnemies(&context)
 	addLocations(&context)
 
@@ -103,22 +103,24 @@ func main() {
 	fmt.Scan()
 }
 
-func addPlayer(context *game.Context) *content.Player {
+func getDefaultPlayerName() string {
 	currentUser, err := user.Current()
 	if err != nil {
-		fmt.Println("Error retrieving current user:", err)
-		return content.NewPlayer("Hero")
+		return "Hero"
 	}
-	userName := currentUser.Username
-	lastIdx := strings.LastIndexAny(userName, "/\\@")
+	username := currentUser.Username
+	lastIdx := strings.LastIndexAny(username, "/\\@")
 	if lastIdx != -1 {
-		userName = userName[lastIdx+1:]
+		username = username[lastIdx+1:]
 	}
+	return username
+}
 
+func addPlayer(context *game.Context, name string) *content.Player {
 	worldX := worldSize / 2
 	worldY := worldSize / 2
 
-	player := content.NewPlayer(userName)
+	player := content.NewPlayer(name)
 	context.World.Add(
 		player,
 		worldX,
