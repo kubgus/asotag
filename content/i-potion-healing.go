@@ -36,7 +36,7 @@ func (k *HealingPotion) GetName() string {
 
 func (k *HealingPotion) GetDesc() string {
 	return fmt.Sprintf(
-		"Restores %v health when used.",
+		"Restores %s health when used.",
 		game.ColHealth(strconv.Itoa(k.Magnitude)),
 	)
 }
@@ -53,5 +53,11 @@ func (k *HealingPotion) UseOnEntity(
 	healAmount := k.Magnitude
 
 	response := targetHealth.GetHealth().Change(healAmount)
-	return response, false, true
+	return fmt.Sprintf(
+		"%s uses %s on %s.\n%s",
+		user.GetName(),
+		k.GetName(),
+		target.GetName(),
+		response,
+	), false, true
 }

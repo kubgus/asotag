@@ -16,7 +16,7 @@ func (p *SpeedPotion) GetName() string {
 }
 
 func (p *SpeedPotion) GetDesc() string {
-	return "Makes next move not end turn."
+	return "Makes the user's next move not end their turn."
 }
 
 func (p *SpeedPotion) UseOnEntity(
@@ -31,7 +31,7 @@ func (p *SpeedPotion) UseOnEntity(
 	targetMovement.GetMovement().ExtraMoves += 1
 
 	return fmt.Sprintf(
-		"%v uses %v on %v. %v's next move won't end their turn!\n",
+		"%s uses %s on %s.\n%s's next move won't end their turn!\n",
 		user.GetName(),
 		p.GetName(),
 		target.GetName(),
