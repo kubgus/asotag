@@ -40,7 +40,7 @@ func main() {
 				"\nIf you want to cancel the current action, type 'x'. " +
 				"(or any invalid selection)\n" +
 				game.ColTooltip("> "),
-			),
+		),
 		)
 		go func() {
 			<-sigs

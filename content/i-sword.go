@@ -75,7 +75,7 @@ func (s *Sword) UseOnEntity(
 	}
 
 	return fmt.Sprintf(
-		"%s slices %s with a %s!\n%s\n",
+		"%s slices %s with a %s!\n%s",
 		user.GetName(),
 		target.GetName(),
 		s.GetName(),
