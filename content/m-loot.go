@@ -32,11 +32,11 @@ func (lm *LootModule) Drop() []game.Item {
 	}
 	// lm.LootLimit == 0 -> unlimited loot
 
-	amount := randomWeightTableChoice(lm.AmountTable)
+	amount := utils.RandWeightedChoice(lm.AmountTable)
 
 	loot := make([]game.Item, 0, amount)
 	for range amount {
-		item := randomWeightTableChoice(lm.LootTable)
+		item := utils.RandWeightedChoice(lm.LootTable)
 		if itemClone, ok := utils.CloneInterface(item); ok {
 			loot = append(loot, itemClone)
 		} else {
@@ -52,24 +52,4 @@ func (lm *LootModule) Drop() []game.Item {
 	}
 
 	return loot
-}
-
-func randomWeightTableChoice[T comparable](table map[T]int) T {
-	totalWeight := 0
-	for _, weight := range table {
-		totalWeight += weight
-	}
-
-	randWeight := utils.RandIntInRange(1, totalWeight)
-	currentWeight := 0
-
-	for item, weight := range table {
-		currentWeight += weight
-		if randWeight <= currentWeight {
-			return item
-		}
-	}
-
-	var zero T
-	return zero
 }

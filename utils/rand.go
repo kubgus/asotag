@@ -30,3 +30,23 @@ func Shuffled[T any](slice []T) []T {
 
 	return shuffled
 }
+
+func RandWeightedChoice[T comparable](table map[T]int) T {
+	totalWeight := 0
+	for _, weight := range table {
+		totalWeight += weight
+	}
+
+	randWeight := RandIntInRange(1, totalWeight)
+	currentWeight := 0
+
+	for item, weight := range table {
+		currentWeight += weight
+		if randWeight <= currentWeight {
+			return item
+		}
+	}
+
+	var zero T
+	return zero
+}
