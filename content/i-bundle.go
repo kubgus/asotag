@@ -33,7 +33,7 @@ func (b *Bundle) UseOnEntity(
 	craftingAllowed := false
 	var craftedItem game.Item
 
-	if workbench := target.(*Workbench); workbench != nil {
+	if workbench, ok := target.(*Workbench); ok {
 		craftingAllowed = true
 		craftedItem = workbench.Craft(user, b.Items)
 	}
@@ -41,7 +41,6 @@ func (b *Bundle) UseOnEntity(
 	if craftedItem != nil {
 		if player, ok := user.(*Player); ok {
 			addResponse := player.GetInventory().AddItems([]game.Item{craftedItem})
-
 			return addResponse, true, true
 		} else {
 			return game.SnipItemCannotBeUsedBy(user, b), false, false
