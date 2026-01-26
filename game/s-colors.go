@@ -15,6 +15,7 @@ var (
 	ColHero     = utils.NewColor(utils.ColorFgBold, utils.ColorFgCyan)
 
 	ColAction  = utils.NewColor(utils.ColorFgBold, utils.ColorFgYellow)
+	ColActionSec = utils.NewColor(utils.ColorFgBold, utils.ColorFgBrightPurple)
 	ColTooltip = utils.NewColor(utils.ColorFgDim, utils.ColorFgWhite)
-	ColSystem  = utils.NewColor(utils.ColorFgBold, utils.ColorFgPurple)
+	ColSystem  = utils.NewColor(utils.ColorFgBold, utils.ColorFgBrightBlue)
 )

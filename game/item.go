@@ -29,9 +29,16 @@ func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string) string 
 	}
 
 	return utils.JoinWithMapFunc(items, "\n", func(i int, item Item) string {
+		colFunc := ColAction
+		if itemEndTurn, ok := item.(ItemUsageEndsTurn); ok {
+			if !itemEndTurn.EndTurnOnUse() {
+				colFunc = ColActionSec
+			}
+		}
+
 		return fmt.Sprintf(
 			"%v: %v %v %v",
-			ColAction(strconv.Itoa(i)),
+			colFunc(strconv.Itoa(i)),
 			item.GetName(),
 			ColTooltip("-"),
 			f(i, item),

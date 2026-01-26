@@ -13,6 +13,17 @@ var Directions = map[string][2]int{
 	"northwest": {-1, -1},
 }
 
+var DirectionShortcuts = map[string][2]int{
+	"n": {0, -1},
+	"ne": {1, -1},
+	"e": {1, 0},
+	"se": {1, 1},
+	"s": {0, 1},
+	"sw": {-1, 1},
+	"w": {-1, 0},
+	"nw": {-1, -1},
+}
+
 func ListDirections() string {
 	var keys []string
 	for k := range Directions {
@@ -23,11 +34,28 @@ func ListDirections() string {
 	})
 }
 
-func DirToDelta(dir string) (int, int, bool) {
-	delta, ok := Directions[dir]
+func DirToDelta(direction string) (int, int, bool) {
+	var delta [2]int
+	var ok bool
+	for dir, dlt := range Directions {
+		if dir == direction {
+			delta = dlt
+			ok = true
+			break
+		}
+	}
+	for dir, dlt := range DirectionShortcuts {
+		if dir == direction {
+			delta = dlt
+			ok = true
+			break
+		}
+	}
+
 	if !ok {
 		return 0, 0, false
 	}
+
 	return delta[0], delta[1], true
 }
 

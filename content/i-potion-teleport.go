@@ -20,6 +20,10 @@ func (p *TeleportPotion) GetDesc() string {
 	return "Teleports the user to a random location."
 }
 
+func (p *TeleportPotion) EndTurnOnUse() bool {
+	return false
+}
+
 func (p *TeleportPotion) UseOnEntity(
 	user, target game.Entity,
 	context *game.Context,

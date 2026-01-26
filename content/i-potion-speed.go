@@ -19,6 +19,10 @@ func (p *SpeedPotion) GetDesc() string {
 	return "Makes the user's next move not end their turn."
 }
 
+func (p *SpeedPotion) EndTurnOnUse() bool {
+	return false
+}
+
 func (p *SpeedPotion) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,

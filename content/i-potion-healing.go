@@ -41,6 +41,10 @@ func (k *HealingPotion) GetDesc() string {
 	)
 }
 
+func (k *HealingPotion) EndTurnOnUse() bool {
+	return false
+}
+
 func (k *HealingPotion) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,

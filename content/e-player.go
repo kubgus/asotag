@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"slices"
-	"sort"
 	"strconv"
 )
 
@@ -109,7 +108,25 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 		return p.ApplyCheats(context), false
 	}
 
-	action, exists := actions[input]
+	var exists bool
+	var action actionFunc
+	for actionName, actionFunc := range actions {
+		if input == utils.StripANSI(actionName) {
+			exists = true
+			action = actionFunc
+			break
+		}
+	}
+	// We have to create a second loop to allow for shorthand actions
+	// (e.g., "m" for "move", "i" for "inventory", etc.)
+	// so that we can prioritize full action names first.
+	for actionName, actionFunc := range actions {
+		if input[0] == utils.StripANSI(actionName)[0] {
+			exists = true
+			action = actionFunc
+			break
+		}
+	}
 	if !exists {
 		return fmt.Sprintf(
 			"Invalid action. (%v)\n",
@@ -156,7 +173,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 type actionFunc func(player *Player, context *game.Context) (string, bool)
 
 var actions = map[string]actionFunc{
-	"bundle": func(player *Player, context *game.Context) (string, bool) {
+	game.ColActionSec("bundle"): func(player *Player, context *game.Context) (string, bool) {
 		if len(player.GetInventory().Items) == 0 {
 			return "No items in inventory to bundle.\n", false
 		}
@@ -241,13 +258,13 @@ var actions = map[string]actionFunc{
 			i++
 		}
 	},
-	"inventory": func(player *Player, context *game.Context) (string, bool) {
+	game.ColActionSec("inventory"): func(player *Player, context *game.Context) (string, bool) {
 		if len(player.GetInventory().Items) == 0 {
 			return game.ColTooltip("No inventory items.\n"), false
 		}
 		return game.ListOrderedItems(player.GetInventory().Items) + "\n", false
 	},
-	"use": func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("use"): func(player *Player, context *game.Context) (string, bool) {
 		if len(player.GetInventory().Items) == 0 {
 			return "No item in inventory to use.", false
 		}
@@ -314,7 +331,7 @@ var actions = map[string]actionFunc{
 			return game.SnipItemCannotBeUsedBy(player, item), false
 		}
 	},
-	"examine": func(player *Player, context *game.Context) (string, bool) {
+	game.ColActionSec("examine"): func(player *Player, context *game.Context) (string, bool) {
 		neighbors := context.World.GetOccupantsSameTile(player)
 		if len(neighbors) == 0 {
 			return "Nothing nearby to examine.\n", false
@@ -340,7 +357,7 @@ var actions = map[string]actionFunc{
 		response := target.GetDesc(player)
 		return response, false
 	},
-	"move": func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("move"): func(player *Player, context *game.Context) (string, bool) {
 		fmt.Printf(
 			game.ColTooltip("Choose a direction to move: %v\n"),
 			game.ListDirections(),
@@ -356,7 +373,7 @@ var actions = map[string]actionFunc{
 
 		return response, endTurn
 	},
-	"look": func(player *Player, context *game.Context) (string, bool) {
+	game.ColActionSec("look"): func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {
 			return fmt.Sprintf(
 				"%v's eyes are already strained from looking around this turn.\n",
@@ -420,7 +437,7 @@ var actions = map[string]actionFunc{
 			player.GetName(),
 		), false
 	},
-	"wait": func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("wait"): func(player *Player, context *game.Context) (string, bool) {
 		return fmt.Sprintf("%v waits.\n", player.GetName()), true
 	},
 }
@@ -430,8 +447,13 @@ func listActions(actions map[string]actionFunc) string {
 	for k := range actions {
 		keys = append(keys, k)
 	}
-	sort.Strings(keys)
-	return utils.JoinWithMapFunc(keys, ", ", func(i int, action string) string {
-		return game.ColAction(action)
+	slices.SortFunc(keys, func(a, b string) int {
+		if utils.StripANSI(a)[0] < utils.StripANSI(b)[0] {
+			return -1
+		} else if utils.StripANSI(a)[0] > utils.StripANSI(b)[0] {
+			return 1
+		}
+		return 0
 	})
+	return utils.Join(keys, ", ")
 }

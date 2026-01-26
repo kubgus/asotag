@@ -19,6 +19,10 @@ func (k *Key) GetDesc() string {
 	return "A small key that can unlock chests."
 }
 
+func (k *Key) EndTurnOnUse() bool {
+	return false
+}
+
 func (k *Key) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,
