@@ -9,14 +9,6 @@ import (
 	"strconv"
 )
 
-const (
-	moveChanceGoblinChase  = 0.5
-	moveChanceGoblinRandom = 0.3
-	moveChanceGoblinIdle   = 0.2
-
-	dropChanceGoblin = 0.25
-)
-
 var (
 	colGoblin = utils.NewColor(utils.ColorFgBold, utils.ColorFgGreen)
 )
@@ -47,6 +39,14 @@ var (
 		"Vorp",
 		"Zig",
 	}
+)
+
+type GoblinAction int
+
+const (
+	GoblinActionIdle GoblinAction = iota
+	GoblinActionMoveRandom
+	GoblinActionChaseEnemy
 )
 
 type Goblin struct {
@@ -154,20 +154,28 @@ func (g *Goblin) OnTurn(context *game.Context) (string, bool) {
 		return response, true
 	}
 
-	rgn := rand.Float32()
-	switch {
-	case rgn < moveChanceGoblinRandom:
-		// Move randomly
+	motivation := map[GoblinAction]int{
+		GoblinActionChaseEnemy: g.GetHealth().CurrentHealth,
+		GoblinActionMoveRandom: 30,
+		GoblinActionIdle:       10,
+	}
+
+	action := utils.RandWeightedChoice(motivation)
+	switch action {
+	case GoblinActionMoveRandom:
 		dx, dy := rand.IntN(3)-1, rand.IntN(3)-1
 		response, endTurn := g.GetMovement().Move(dx, dy, &context.World)
 		return response, endTurn
-	case rgn < moveChanceGoblinRandom+moveChanceGoblinChase:
-		// Move towards closest enemy
+	case GoblinActionChaseEnemy:
 		dx, dy, target := g.getDirectionToClosestEnemy(context)
 
 		if target != nil {
 			result, endTurn := g.GetMovement().Move(dx, dy, &context.World)
-			return fmt.Sprintf("%sMoving towards %s.\n", result, target.GetName()), endTurn
+			return fmt.Sprintf(
+				"%sMoving towards %s.\n",
+				result,
+				target.GetName(),
+			), endTurn
 		}
 
 		return fmt.Sprintf("%v looks around, but finds no one to hunt.\n", g.GetName()), true
