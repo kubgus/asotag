@@ -1,6 +1,9 @@
 package game
 
-import "asotag/utils"
+import (
+	"asotag/utils"
+	"sort"
+)
 
 var Directions = map[string][2]int{
 	"north":     {0, -1},
@@ -14,24 +17,33 @@ var Directions = map[string][2]int{
 }
 
 var DirectionShortcuts = map[string][2]int{
-	"n": {0, -1},
+	"n":  {0, -1},
 	"ne": {1, -1},
-	"e": {1, 0},
+	"e":  {1, 0},
 	"se": {1, 1},
-	"s": {0, 1},
+	"s":  {0, 1},
 	"sw": {-1, 1},
-	"w": {-1, 0},
+	"w":  {-1, 0},
 	"nw": {-1, -1},
 }
 
-func ListDirections() string {
+func ListDirectionsColFunc(colFunc func(string) string) string {
 	var keys []string
 	for k := range Directions {
 		keys = append(keys, k)
 	}
+	sort.Strings(keys)
 	return utils.JoinAdvanced(keys, ", ", " or ", func(_ int, direction string) string {
-		return ColAction(direction)
+		return colFunc(direction)
 	})
+}
+
+func ListDirections() string {
+	return ListDirectionsColFunc(ColAction)
+}
+
+func ListDirectionsEndTurn() string {
+	return ListDirectionsColFunc(ColActionEndTurn)
 }
 
 func DirToDelta(direction string) (int, int, bool) {

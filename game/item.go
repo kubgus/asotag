@@ -23,16 +23,18 @@ func ListItems(items []Item) string {
 	return utils.JoinWithLast(keys, ", ", " and ")
 }
 
-func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string) string {
+func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string, showEndTurn bool) string {
 	if len(items) == 0 {
 		return ColTooltip("None")
 	}
 
 	return utils.JoinWithMapFunc(items, "\n", func(i int, item Item) string {
 		colFunc := ColAction
-		if itemEndTurn, ok := item.(ItemUsageEndsTurn); ok {
-			if !itemEndTurn.EndTurnOnUse() {
-				colFunc = ColActionSec
+		if showEndTurn {
+			if itemEndTurn, ok := item.(ItemUsageEndsTurn); ok {
+				if itemEndTurn.EndTurnOnUse() {
+					colFunc = ColActionEndTurn
+				}
 			}
 		}
 
@@ -49,7 +51,13 @@ func ListOrderedItemsWithMapFunc(items []Item, f func(int, Item) string) string 
 func ListOrderedItems(items []Item) string {
 	return ListOrderedItemsWithMapFunc(items, func(i int, item Item) string {
 		return item.GetDesc()
-	})
+	}, false)
+}
+
+func ListOrderedItemsEndTurn(items []Item) string {
+	return ListOrderedItemsWithMapFunc(items, func(i int, item Item) string {
+		return item.GetDesc()
+	}, true)
 }
 
 func ItemsMatchUnordered(a, b []Item) bool {

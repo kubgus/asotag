@@ -41,6 +41,10 @@ func (s *Spear) GetDesc() string {
 	)
 }
 
+func (s *Spear) EndTurnOnUse() bool {
+	return true
+}
+
 func (s *Spear) UseInDirection(
 	user game.Entity,
 	dx, dy int,

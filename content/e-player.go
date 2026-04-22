@@ -101,7 +101,7 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 		listActions(actions),
 	)
 
-	fmt.Println("\nChoose your action:")
+	fmt.Println(game.ColTooltip("\nChoose your action:"))
 	input := game.Input()
 
 	if input == cheatCommand {
@@ -121,7 +121,7 @@ func (p *Player) OnTurn(context *game.Context) (string, bool) {
 	// (e.g., "m" for "move", "i" for "inventory", etc.)
 	// so that we can prioritize full action names first.
 	for actionName, actionFunc := range actions {
-		if input[0] == utils.StripANSI(actionName)[0] {
+		if input == string(utils.StripANSI(actionName)[0]) {
 			exists = true
 			action = actionFunc
 			break
@@ -173,7 +173,7 @@ func (p *Player) ApplyCheats(context *game.Context) string {
 type actionFunc func(player *Player, context *game.Context) (string, bool)
 
 var actions = map[string]actionFunc{
-	game.ColActionSec("bundle"): func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("bundle"): func(player *Player, context *game.Context) (string, bool) {
 		if len(player.GetInventory().Items) == 0 {
 			return "No items in inventory to bundle.\n", false
 		}
@@ -184,10 +184,11 @@ var actions = map[string]actionFunc{
 			fmt.Println(game.ListOrderedItemsWithMapFunc(
 				player.GetInventory().Items, func(idx int, item game.Item) string {
 					if slices.Contains(itemIndexes, idx) {
-						return game.ColSystem("(selected for bundling)")
+						return game.ColActionEndTurn("(selected for bundling)")
 					}
 					return item.GetDesc()
 				},
+				false,
 			))
 			input := game.Input()
 
@@ -209,7 +210,13 @@ var actions = map[string]actionFunc{
 				continue
 			}
 
-			bundle, isBundleSelected := player.GetInventory().Items[itemIndex].(*Bundle)
+			hasSelectedIndex := player.GetInventory().HasIndex(itemIndex)
+
+			var bundle *Bundle
+			isBundleSelected := false
+			if hasSelectedIndex {
+				bundle, isBundleSelected = player.GetInventory().Items[itemIndex].(*Bundle)
+			}
 
 			if i == 0 && isBundleSelected {
 				removeResponse := player.GetInventory().RemoveItems([]int{itemIndex})
@@ -218,7 +225,7 @@ var actions = map[string]actionFunc{
 				return addResponse + removeResponse, false
 			}
 
-			if !player.GetInventory().HasIndex(itemIndex) || indexErr != nil || isBundleSelected {
+			if !hasSelectedIndex || indexErr != nil || isBundleSelected {
 				if len(itemIndexes) < 1 {
 					return "Nothing to bundle.\n", false
 				}
@@ -258,7 +265,7 @@ var actions = map[string]actionFunc{
 			i++
 		}
 	},
-	game.ColActionSec("inventory"): func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("inventory"): func(player *Player, context *game.Context) (string, bool) {
 		if len(player.GetInventory().Items) == 0 {
 			return game.ColTooltip("No inventory items.\n"), false
 		}
@@ -270,7 +277,7 @@ var actions = map[string]actionFunc{
 		}
 
 		fmt.Println(game.ColTooltip("Select an item to use:"))
-		fmt.Println(game.ListOrderedItems(player.GetInventory().Items))
+		fmt.Println(game.ListOrderedItemsEndTurn(player.GetInventory().Items))
 		input := game.Input()
 
 		itemIndex, indexErr := strconv.Atoi(input)
@@ -312,11 +319,15 @@ var actions = map[string]actionFunc{
 				game.ColTooltip("Choose a direction to use: %v\n"),
 				game.ListDirections(),
 			)
-			var directionInput = game.Input()
+			directionInput := game.Input()
 
-			var dx, dy, ok = game.DirToDelta(directionInput)
+			dx, dy, ok := game.DirToDelta(directionInput)
 			if !ok {
 				return game.SnipInvalidDirection(directionInput), false
+			}
+
+			if fullDir, ok := game.DeltaToDir(dx, dy); ok {
+				directionInput = fullDir
 			}
 
 			response, ok := player.GetInventory().UseItemInDirection(
@@ -331,7 +342,7 @@ var actions = map[string]actionFunc{
 			return game.SnipItemCannotBeUsedBy(player, item), false
 		}
 	},
-	game.ColActionSec("examine"): func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("examine"): func(player *Player, context *game.Context) (string, bool) {
 		neighbors := context.World.GetOccupantsSameTile(player)
 		if len(neighbors) == 0 {
 			return "Nothing nearby to examine.\n", false
@@ -360,7 +371,7 @@ var actions = map[string]actionFunc{
 	game.ColAction("move"): func(player *Player, context *game.Context) (string, bool) {
 		fmt.Printf(
 			game.ColTooltip("Choose a direction to move: %v\n"),
-			game.ListDirections(),
+			game.ListDirectionsEndTurn(),
 		)
 		input := game.Input()
 
@@ -373,7 +384,7 @@ var actions = map[string]actionFunc{
 
 		return response, endTurn
 	},
-	game.ColActionSec("look"): func(player *Player, context *game.Context) (string, bool) {
+	game.ColAction("look"): func(player *Player, context *game.Context) (string, bool) {
 		if player.looksThisTurn >= maxLooksPerTurnPlayer {
 			return fmt.Sprintf(
 				"%v's eyes are already strained from looking around this turn.\n",
@@ -437,7 +448,7 @@ var actions = map[string]actionFunc{
 			player.GetName(),
 		), false
 	},
-	game.ColAction("wait"): func(player *Player, context *game.Context) (string, bool) {
+	game.ColActionEndTurn("wait"): func(player *Player, context *game.Context) (string, bool) {
 		return fmt.Sprintf("%v waits.\n", player.GetName()), true
 	},
 }

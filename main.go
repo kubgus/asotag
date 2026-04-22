@@ -28,8 +28,24 @@ const (
 )
 
 func main() {
-	fmt.Print(game.ColSystem("Welcome to ASOTAG!\n"))
-	fmt.Print(game.ColSystem("Defeat all enemies to win, but beware of your health!\n\n\n"))
+	fmt.Print(game.ColSystem(
+		"Welcome to\n" +
+			"           _____  ____ _______       _____\n" +
+			"    /\\    / ____|/ __ \\__   __|/\\   / ____|\n" +
+			"   /  \\  | (___ | |  | | | |  /  \\ | |  __\n" +
+			"  / /\\ \\  \\___ \\| |  | | | | / /\\ \\| | |_ |\n" +
+			" / ____ \\ ____) | |__| | | |/ ____ \\ |__| |\n" +
+			"/_/    \\_\\_____/ \\____/  |_/_/    \\_\\_____|\n\n" +
+			"All available actions are highlighted in " +
+			game.ColAction("yellow") + " and " +
+			game.ColActionEndTurn("purple") + ".\n" +
+			"Actions marked with " +
+			game.ColActionEndTurn("purple") + " can end your turn.\n" +
+			"Enter " +
+			game.ColTooltip("'x'") +
+			" to cancel an action without losing a turn.\n\n" +
+			"Defeat all enemies to win, but beware of your health!\n\n",
+	))
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)

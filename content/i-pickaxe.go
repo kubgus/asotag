@@ -48,6 +48,10 @@ func (p *Pickaxe) GetDesc() string {
 	)
 }
 
+func (p *Pickaxe) EndTurnOnUse() bool {
+	return true
+}
+
 func (p *Pickaxe) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,

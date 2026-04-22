@@ -49,6 +49,10 @@ func (s *Sword) GetDesc() string {
 	)
 }
 
+func (s *Sword) EndTurnOnUse() bool {
+	return true
+}
+
 func (s *Sword) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,

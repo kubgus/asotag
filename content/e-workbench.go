@@ -103,12 +103,16 @@ func (w *Workbench) GetDesc(user game.Entity) string {
 	)
 
 	return fmt.Sprintf(
-		"%v\n%v\n",
+		"%v\n\n%v\n\n%v\n",
 		fmt.Sprintf(
 			game.ColTooltip("%v can be used to craft the following items:"),
 			w.GetName(),
 		),
 		recipesList,
+		fmt.Sprintf(
+			"Bundle the required items and use them on the %v to craft.",
+			w.GetName(),
+		),
 	)
 }
 

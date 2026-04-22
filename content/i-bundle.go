@@ -26,6 +26,10 @@ func (b *Bundle) GetDesc() string {
 	)
 }
 
+func (b *Bundle) EndTurnOnUse() bool {
+	return true
+}
+
 func (b *Bundle) UseOnEntity(
 	user, target game.Entity,
 	_ *game.Context,
