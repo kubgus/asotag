@@ -25,7 +25,7 @@ var (
 		"Grok",
 		"Hugo",
 		"Jinx",
-		"Kip",
+		"Kraig",
 		"Lug",
 		"Muck",
 		"Nibble",
